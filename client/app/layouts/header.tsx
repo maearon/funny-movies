@@ -15,18 +15,14 @@ const Header: NextPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        await dispatch(fetchUser());
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
+    dispatch(fetchUser()).finally(() => setLoading(false));
   }, [dispatch]);
+  
+  useEffect(() => {
+    if (!loading && userData?.value?.email) {
+      router.push("/");
+    }
+  }, [loading, userData?.value?.email, router]);
 
   const onClick = async (e: any) => {
     e.preventDefault();

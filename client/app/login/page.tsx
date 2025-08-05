@@ -38,21 +38,14 @@ const New: NextPage = () => {
   const userData = useAppSelector(selectUser)
   
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        await dispatch(fetchUser());
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-      } finally {
-        setLoading(false);
-        if (userData?.value?.email) {
-          router.push("/");
-        }
-      }
-    };
-
-    fetchUserData();
-  }, [dispatch, router, userData?.value?.email]);
+    dispatch(fetchUser()).finally(() => setLoading(false));
+  }, [dispatch]);
+  
+  useEffect(() => {
+    if (!loading && userData?.value?.email) {
+      router.push("/");
+    }
+  }, [loading, userData?.value?.email, router]);
 
   const validationSchema = Yup.object({
     email: Yup.string()
