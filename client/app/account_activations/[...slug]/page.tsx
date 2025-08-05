@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import accountActivationApi from "@/components/shared/api/accountActivationApi";
 import flashMessage from "@/components/shared/flashMessages";
 
 // Kiểu dữ liệu cho params
 interface EditProps {
-  params: {
+  params: Promise<{
     slug: string[]; // slug là mảng chuỗi
-  };
+  }>;
 }
 
-export default function Edit({ params }: EditProps) {
+export default function Edit(props: EditProps) {
+  const params = use(props.params);
   const router = useRouter();
 
   // Giải mã slug thành activation_token và email

@@ -1,7 +1,7 @@
 "use client";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, use } from 'react';
 import Pagination from 'react-js-pagination';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectUser } from '../../../redux/session/sessionSlice';
@@ -12,7 +12,8 @@ import flashMessage from '../../../components/shared/flashMessages';
 import FollowForm from '../../../components/users/FollowForm';
 import Link from 'next/link';
 
-const Show = ({ params }: { params: { id: string } }) => {
+const Show = (props: { params: Promise<{ id: string }> }) => {
+  const params = use(props.params);
   const [user, setUser] = useState<UserShow | null>(null);
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
   const [idRelationships, setIdRelationships] = useState<string | null>(null);

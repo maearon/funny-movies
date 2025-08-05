@@ -1,14 +1,15 @@
 "use client";
 import Image from "next/image";
 import Link from 'next/link'
-import { SetStateAction, useCallback, useEffect, useState } from 'react'
+import { SetStateAction, useCallback, useEffect, useState, use } from 'react';
 import { useAppSelector } from '../../../redux/hooks'
 import { selectUser } from '../../../redux/session/sessionSlice'
 import userApi, { IUserFollow, UserFollow } from '../../../components/shared/api/userApi'
 import flashMessage from '../../../components/shared/flashMessages'
 import Pagination from 'react-js-pagination'
 
-const ShowFollow = ({params}: {params: {slug: string[]}}) =>{
+const ShowFollow = (props: {params: Promise<{slug: string[]}>}) => {
+  const params = use(props.params);
   const [users, setUsers] = useState([] as UserFollow[])
   const [xusers, setXusers] = useState([] as UserFollow[])
   const [page, setPage] = useState(1)

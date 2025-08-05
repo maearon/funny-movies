@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 import flashMessage from '../../../components/shared/flashMessages'
 import passwordResetApi from '../../../components/shared/api/passwordResetApi'
-import { MutableRefObject, useRef, useState } from 'react'
+import { MutableRefObject, useRef, useState, use } from 'react';
 // import errorMessage from '../../components/shared/errorMessages'
 
 const initialState = {
@@ -12,7 +12,8 @@ const initialState = {
   errorMessage: [] as string[],
 };
 
-const Edit = ({params}: {params: {slug: string[]}}) =>{
+const Edit = (props: {params: Promise<{slug: string[]}>}) => {
+  const params = use(props.params);
   const router = useRouter()
   const [state, setState] = useState(initialState)
   const { reset_token, email } = 
@@ -21,7 +22,7 @@ const Edit = ({params}: {params: {slug: string[]}}) =>{
   { reset_token: params.slug[0], email: decodeURIComponent(params.slug[1]) } 
   : { reset_token: '', email: '' };
   const dispatch = useDispatch()
-  const myRef = useRef() as MutableRefObject<HTMLInputElement>
+  const myRef = useRef(undefined) as MutableRefObject<HTMLInputElement>
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;

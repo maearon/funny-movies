@@ -12,7 +12,7 @@ const initialState = {
 const New: NextPage = () => {
   const router = useRouter()
   const [state, setState] = useState(initialState)
-  const myRef = useRef() as MutableRefObject<HTMLInputElement>
+  const myRef = useRef(undefined) as MutableRefObject<HTMLInputElement>
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;

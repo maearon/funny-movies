@@ -2,7 +2,7 @@
 import Image from 'next/image'
 import { ErrorMessage, Field, FieldArray, Form, Formik } from 'formik'
 import { useRouter } from 'next/navigation'
-import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react'
+import React, { MutableRefObject, useCallback, useEffect, useRef, useState, use } from 'react';
 import * as Yup from 'yup'
 import userApi, { UserEdit } from '../../../../components/shared/api/userApi'
 import errorMessage from '../../../../components/shared/errorMessages'
@@ -44,7 +44,8 @@ const useSafeRouter = () => {
   }
 };
 
-const Edit = ({params}: {params: {id: string}}) => {
+const Edit = (props: {params: Promise<{id: string}>}) => {
+  const params = use(props.params);
   const router = useSafeRouter();
   const id = params.id
   const [user, setUser] = useState({} as UserEdit)
@@ -55,7 +56,7 @@ const Edit = ({params}: {params: {id: string}}) => {
   const [password_confirmation, setPasswordConfirmation] = useState('')
   const [errors, setErrors] = useState([] as string[])
   const [gravatar, setGravatar] = useState('')
-  const inputEl = useRef() as MutableRefObject<HTMLInputElement>
+  const inputEl = useRef(undefined) as MutableRefObject<HTMLInputElement>
 
   const getUserInfo= useCallback(async () => { 
     userApi.edit(id as string

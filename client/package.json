@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -28,9 +28,9 @@
     "graphql": "^16.5.0",
     "graphql-request": "^4.3.0",
     "graphql-tag": "^2.12.6",
-    "next": "14.2.3",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "15.4.5",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "react-js-pagination": "^3.0.3",
     "react-loading-skeleton": "^3.4.0",
     "react-redux": "^7.2.4",
@@ -48,14 +48,18 @@
     "@graphql-codegen/typescript-operations": "^2.4.2",
     "@graphql-codegen/typescript-react-apollo": "^3.2.16",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
     "@types/react-js-pagination": "^3.0.4",
     "@types/react-redux": "^7.1.20",
     "cypress": "13.11.0",
     "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.3",
+    "eslint-config-next": "15.4.5",
     "eslint-plugin-next": "^0.0.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7"
   }
 }

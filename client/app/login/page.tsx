@@ -32,7 +32,7 @@ const New: NextPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberme] = useState(true)
-  const inputEl = useRef() as MutableRefObject<HTMLInputElement>
+  const inputEl = useRef(undefined) as MutableRefObject<HTMLInputElement>
   const [errors, setErrors] = useState<ErrorMessageType>({});
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
