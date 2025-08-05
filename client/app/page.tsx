@@ -261,7 +261,7 @@ const Home: NextPage = () => {
     </>
   ) : userData.error ? (
     <h2>{userData.error}</h2>
-  ) : userData.value.email ? (
+  ) : userData?.value?.email ? (
     <div className="row">
       <aside className="col-md-4">
         <section className="user_info">

@@ -99,7 +99,7 @@ const New: NextPage = () => {
     </>
   ) : userData.error ? (
     <h2>{userData.error}</h2>
-  ) : userData.value.email ? (
+  ) : userData?.value?.email ? (
     <>
     <div>You did login, you now should in Home not Login...</div>
     </>

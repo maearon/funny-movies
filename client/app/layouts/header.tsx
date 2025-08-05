@@ -87,7 +87,7 @@ const Header: NextPage = () => {
           <ul className="nav navbar-nav navbar-right collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             {loading ? (
               <li>Loading...</li>
-            ) : userData.value.email ? (
+            ) : userData?.value?.email ? (
               <>
                 <li><Link href={`/users/${userData.value.id}`}>{"Welcome " + userData.value.email}</Link></li>
                 <li className="divider"></li>
