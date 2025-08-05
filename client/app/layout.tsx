@@ -1,14 +1,13 @@
 "use client";
-import React from 'react';
-import "../styles/globals.css"
-import Head from 'next/head'
-import Header from './layouts/header'
-import Footer from './layouts/footer'
-import { Provider } from 'react-redux'
-import { store } from '../redux/store'
-// import { fetchUser } from '../redux/session/sessionSlice'
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import React, { useEffect } from 'react';
+import "../styles/globals.css";
+import Head from 'next/head';
+import Header from './layouts/header';
+import Footer from './layouts/footer';
+import { Provider } from 'react-redux';
+import { store } from '../redux/store';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import localFont from "next/font/local";
 import Script from "next/script";
 import ReactQueryProvider from './ReactQueryProvider';
@@ -18,18 +17,19 @@ const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
 });
-
-useInitSession()
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useInitSession();
+
   return (
     <Provider store={store}>
       <ReactQueryProvider>
@@ -46,18 +46,15 @@ export default function RootLayout({
 
               <div className="container">
                 {children}
-
                 <Footer />
               </div>
 
-              {/* Toast Container for managing toasts */}
               <ToastContainer
                 autoClose={8000}
                 draggable={false}
-                position="top-center" // Use the position directly as a string
+                position="top-center"
               />
 
-              {/* External scripts */}
               <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></Script>
               <Script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></Script>
               <Script

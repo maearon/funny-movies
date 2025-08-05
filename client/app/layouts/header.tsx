@@ -1,27 +1,21 @@
 "use client";
 import type { NextPage } from 'next';
 import Link from 'next/link';
-// import { fetchUser, selectUser } from '../../redux/session/sessionSlice';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-// import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import sessionApi from '../../components/shared/api/sessionApi';
-import flashMessage from '@/components/shared/flashMessages';
 import { useAppSelector } from '@/redux/hooks';
 import { selectUser } from '@/redux/session/sessionSlice';
 import { useLogout } from '@/components/shared/api/hooks/useLoginMutation';
 
 const Header: NextPage = () => {
   const router = useRouter();
-  // const current_user = useAppSelector(selectUser);
-  const { value: current_user, status } = useAppSelector(selectUser)
-  // const dispatch = useAppDispatch();
-  // const [loading, setLoading] = useState(true);
-  const loading = status === "loading"
+  const { value: current_user, status } = useAppSelector(selectUser);
+  const loading = status === "loading";
 
-  const onClick = async (e: any) => {
+  const logout = useLogout();
+
+  const onClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    useLogout()
+    await logout();
   };
 
   return (
