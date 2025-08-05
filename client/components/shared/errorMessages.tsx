@@ -21,8 +21,11 @@ const ErrorMessage: React.FC<Props> = ({ errorMessage }) => {
         <ul key={key}>
           {Array.isArray(errorMessage[key]) ? (
             errorMessage[key].map((error, index) => (
+              // <li key={index}>
+              //   {key} {error}
+              // </li>
               <li key={index}>
-                {key} {error}
+                {error}
               </li>
             ))
           ) : (
