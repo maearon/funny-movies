@@ -1,13 +1,12 @@
 import "../styles/globals.css";
 import localFont from "next/font/local";
 import ReactQueryProvider from './ReactQueryProvider';
-import { Provider } from "react-redux";
-import { store } from "../redux/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Script from "next/script";
 import Header from "./layouts/header";
 import Footer from "./layouts/footer";
+import { Providers } from "@/components/providers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Provider store={store}>
+        <Providers>
           <ReactQueryProvider>
             <div className="App">
               <Header />
@@ -53,7 +52,7 @@ export default function RootLayout({
               ></Script>
             </div>
           </ReactQueryProvider>
-        </Provider>
+        </Providers>
       </body>
     </html>
   );
