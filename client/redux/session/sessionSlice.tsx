@@ -10,6 +10,7 @@ export interface User {
   id: string; // ✅ sửa thành string
   email: string
   name: string
+  role?: boolean
   avatar?: string
   level?: string
   token?: string
