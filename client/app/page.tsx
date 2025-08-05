@@ -9,9 +9,8 @@ import Skeleton from 'react-loading-skeleton'
 import micropostApi, { CreateResponse, ListResponse, Micropost } from '../components/shared/api/micropostApi'
 import ShowErrors, { ErrorMessageType } from '@/components/shared/errorMessages'
 import flashMessage from '../components/shared/flashMessages'
-import { useAppSelector } from '../redux/hooks'
+import { useAppDispatch, useAppSelector } from '../redux/hooks'
 import { fetchUser, selectUser } from '../redux/session/sessionSlice'
-import { useDispatch } from 'react-redux';
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
@@ -33,7 +32,7 @@ const Home: NextPage = () => {
   const inputEl = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
   const userData = useAppSelector(selectUser)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
   const [authCode, setAuthCode] = useState<string | null>(null);
 

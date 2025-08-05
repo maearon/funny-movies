@@ -3,7 +3,6 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, {  useEffect, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { fetchUser, selectUser, User } from '../../redux/session/sessionSlice'
 import sessionApi, { Response } from '../../components/shared/api/sessionApi'
 import flashMessage from '../../components/shared/flashMessages'
@@ -11,7 +10,7 @@ import { ErrorMessage, Field, Form, Formik, FormikProps, useFormik, withFormik }
 import * as Yup from 'yup'
 // import TextError from '../../components/shared/TextError'
 import ShowErrors, { ErrorMessageType } from '@/components/shared/errorMessages';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 
 const initialValues = {
   email: '',
@@ -34,7 +33,7 @@ const New: NextPage = () => {
   const [rememberMe, setRememberme] = useState(true)
   const inputEl = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
   const userData = useAppSelector(selectUser)
   
