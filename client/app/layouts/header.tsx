@@ -38,11 +38,11 @@ const Header: NextPage = () => {
       // Always clear local and session storage
       localStorage.removeItem("token");
       localStorage.removeItem("remember_token");
-      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("refresh_token");
       localStorage.removeItem("accessToken");
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("remember_token");
-      sessionStorage.removeItem("refreshToken");
+      sessionStorage.removeItem("refresh_token");
       sessionStorage.removeItem("accessToken");
       await dispatch(fetchUser()); // Fetch user data if needed
   
@@ -59,11 +59,11 @@ const Header: NextPage = () => {
       // Always clear local and session storage
       localStorage.removeItem("token");
       localStorage.removeItem("remember_token");
-      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("refresh_token");
       localStorage.removeItem("accessToken");
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("remember_token");
-      sessionStorage.removeItem("refreshToken");
+      sessionStorage.removeItem("refresh_token");
       sessionStorage.removeItem("accessToken");
       await dispatch(fetchUser()); // Fetch user data if needed
   
