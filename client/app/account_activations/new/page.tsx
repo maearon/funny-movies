@@ -1,7 +1,7 @@
 "use client";
 import { NextPage } from 'next'
 import { useRouter } from 'next/navigation'
-import React, { MutableRefObject, useRef, useState } from 'react'
+import React, {  useRef, useState } from 'react'
 import accountActivationApi from '../../../components/shared/api/accountActivationApi'
 import flashMessage from '../../../components/shared/flashMessages'
 import ShowErrors, { ErrorMessageType } from '@/components/shared/errorMessages';
@@ -17,7 +17,7 @@ const initialState = {
 const New: NextPage = () => {
   const router = useRouter()
   const [state, setState] = useState(initialState)
-  const myRef = useRef(null) as MutableRefObject<HTMLInputElement>
+  const myRef = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
 
   const handleChange = (e: { target: { name: any; value: any } }) => {

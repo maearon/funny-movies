@@ -2,7 +2,7 @@
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
+import React, {  useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { fetchUser, selectUser, User } from '../../redux/session/sessionSlice'
 import sessionApi, { Response } from '../../components/shared/api/sessionApi'
@@ -32,7 +32,7 @@ const New: NextPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberme] = useState(true)
-  const inputEl = useRef(null) as MutableRefObject<HTMLInputElement>
+  const inputEl = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)

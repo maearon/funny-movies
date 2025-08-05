@@ -1,7 +1,7 @@
 "use client";
 import { NextPage } from 'next'
 import { useRouter } from 'next/navigation'
-import React, { MutableRefObject, useRef, useState } from 'react'
+import React, {  useRef, useState } from 'react'
 import passwordResetApi from '../../../components/shared/api/passwordResetApi';
 import flashMessage from '../../../components/shared/flashMessages';
 
@@ -12,7 +12,7 @@ const initialState = {
 const New: NextPage = () => {
   const router = useRouter()
   const [state, setState] = useState(initialState)
-  const myRef = useRef(null) as MutableRefObject<HTMLInputElement>
+  const myRef = useRef<HTMLInputElement>(null)
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;

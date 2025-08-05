@@ -2,7 +2,7 @@
 import Image from 'next/image'
 import { ErrorMessage, Field, FieldArray, Form, Formik } from 'formik'
 import { useRouter } from 'next/navigation'
-import React, { MutableRefObject, useCallback, useEffect, useRef, useState, use } from 'react';
+import React, {  useCallback, useEffect, useRef, useState, use } from 'react';
 import * as Yup from 'yup'
 import userApi, { UserEdit } from '../../../../components/shared/api/userApi'
 import errorMessage from '../../../../components/shared/errorMessages'
@@ -56,7 +56,7 @@ const Edit = (props: {params: Promise<{id: string}>}) => {
   const [password_confirmation, setPasswordConfirmation] = useState('')
   const [errors, setErrors] = useState([] as string[])
   const [gravatar, setGravatar] = useState('')
-  const inputEl = useRef(null) as MutableRefObject<HTMLInputElement>
+  const inputEl = useRef<HTMLInputElement>(null)
 
   const getUserInfo= useCallback(async () => { 
     userApi.edit(id as string

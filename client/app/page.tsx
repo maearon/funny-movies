@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import Image from "next/image";
 import styles from "./page.module.css";
 import Link from 'next/link'
-import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react'
+import React, {  useCallback, useEffect, useRef, useState } from 'react'
 import Pagination from 'react-js-pagination'
 import Skeleton from 'react-loading-skeleton'
 import micropostApi, { CreateResponse, ListResponse, Micropost } from '../components/shared/api/micropostApi'
@@ -30,7 +30,7 @@ const Home: NextPage = () => {
   const [content, setContent] = useState('')
   const [image, setImage] = useState(null)
   const [imageName, setImageName] = useState('')
-  const inputEl = useRef(null) as MutableRefObject<HTMLInputElement>
+  const inputEl = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
   const userData = useAppSelector(selectUser)
   const dispatch = useDispatch()
