@@ -110,6 +110,10 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
+    setFeeds()
+  }, [page])
+
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
 
@@ -131,6 +135,7 @@ const Home: NextPage = () => {
       .then(response => response.json())
       .then(data => {
         localStorage.setItem('accessToken', data.access_token);
+        setFeeds();
         window.history.pushState({}, document.title, "/");
       })
       .catch(error => {
