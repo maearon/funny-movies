@@ -1,6 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
 import { useDispatch } from "react-redux"
-import { fetchUser } from "@/store/sessionSlice"
 import type { AppDispatch } from "@/store/store"
 import { setTokens } from "@/lib/token"
 import javaService from "@/api/services/javaService"
@@ -8,11 +7,11 @@ import { useToast } from "@/components/ui/use-toast"
 import { handleNetworkError } from "@/components/shared/handleNetworkError"
 // apps/web/api/hooks/useLogout.ts
 import { useCallback } from "react"
-import { logout } from "@/store/sessionSlice"
 import { clearTokens } from "@/lib/token"
 // ------------------------
 // apps/web/api/hooks/useInitSession.ts
 import { useCurrentUser } from "./useCurrentUser"
+import { fetchUser, logout } from "@/redux/session/sessionSlice"
 
 export const useInitSession = () => {
   useCurrentUser()

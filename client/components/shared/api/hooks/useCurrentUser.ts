@@ -1,9 +1,9 @@
 // apps/web/api/hooks/useCurrentUser.ts
 import { useQuery } from "@tanstack/react-query"
 import { useDispatch } from "react-redux"
-import { fetchUser } from "@/store/sessionSlice"
-import type { AppDispatch } from "@/store/store"
+import type { AppDispatch } from "@/redux/store"
 import { getAccessToken } from "@/lib/token"
+import { fetchUser } from "@/redux/session/sessionSlice"
 
 export const useCurrentUser = () => {
   const dispatch = useDispatch<AppDispatch>()
