@@ -127,7 +127,7 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
       </aside>
 
       <div className="col-md-8">
-        {currentUser && currentUser.value.id !== id && (
+        {currentUser && currentUser?.value?.id !== id && (
           <FollowForm
             id={id}
             user={user}
@@ -168,7 +168,7 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
                   </span>
                   <span className="timestamp">
                     {`Posted ${micropost.timestamp} ago. `}
-                    {currentUser.value.id === micropost.user_id && (
+                    {currentUser?.value?.id === micropost.user_id && (
                       <Link href={`#/microposts/${micropost.id}`} onClick={() => removeMicropost(micropost.id)}>
                         delete
                       </Link>
