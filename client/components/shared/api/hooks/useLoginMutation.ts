@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
 import { useDispatch } from "react-redux"
-import type { AppDispatch } from "@/store/store"
+import type { AppDispatch } from "@/redux/store"
 import { setTokens } from "@/lib/token"
 import javaService from "@/api/services/javaService"
 import { useToast } from "@/components/ui/use-toast"
