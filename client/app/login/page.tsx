@@ -60,8 +60,7 @@ const New: NextPage = () => {
       {
         session: {
           email: values.email,
-          password: values.password,
-          remember_me: values.rememberMe ? "1" : "1"
+          password: values.password
         }
       }
     )
