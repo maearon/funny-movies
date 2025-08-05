@@ -9,7 +9,7 @@ export interface SessionParams {
 export interface LoginField {
   email: string
   password: string
-  remember_me: string
+  // remember_me: string
 }
 
 export interface Response<User> {
