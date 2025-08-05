@@ -1,3 +1,5 @@
+'use client'
+
 import "../styles/globals.css";
 import localFont from "next/font/local";
 import ReactQueryProvider from './ReactQueryProvider';
@@ -7,7 +9,8 @@ import Script from "next/script";
 import Header from "./layouts/header";
 import Footer from "./layouts/footer";
 import { Providers } from "@/components/providers";
-import SessionInitializer from "./SessionInitializer";
+import { store } from "@/redux/store";
+import { fetchUser } from "@/redux/session/sessionSlice";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -24,6 +27,8 @@ export const metadata = {
   description: "Share and enjoy funny movies",
 };
 
+store.dispatch(fetchUser())
+
 export default function RootLayout({
   children,
 }: {
@@ -34,7 +39,6 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>
           <ReactQueryProvider>
-            <SessionInitializer />
             <div className="App">
               <Header />
               <div className="container">
