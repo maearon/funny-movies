@@ -39,8 +39,9 @@ const New: NextPage = () => {
         }
       }
     ).then(response => {
+      myRef.current!.blur()
       // if (response.user) {
-      //   myRef.current.blur()
+      //   myRef.current!.blur()
       //   setState({
       //     ...state,
       //     errors: {},
@@ -50,7 +51,7 @@ const New: NextPage = () => {
       //   // window.location.assign('https://mail.google.com/mail/u/0')  
       // }
       // if (response.errors) {
-      //   myRef.current.blur()
+      //   myRef.current!.blur()
       //   setState({
       //     ...state,
       //     errors: response.errors,

@@ -101,7 +101,7 @@ const Edit = (props: {params: Promise<{id: string}>}) => {
       }
     ).then(response => {
       // setTimeout(function(){
-      inputEl.current.blur()
+      inputEl.current!.blur()
       // console.log('Form data', values)
       // console.log('submitProps', submitProps)
       submitProps.setSubmitting(false)

@@ -226,14 +226,14 @@ const Home: NextPage = () => {
     .then((response: any) => response.json().then((data: CreateResponse) => {
       if (data.flash) {
         setFeeds()
-        inputEl.current.blur()
+        inputEl.current!.blur()
         flashMessage(...data.flash)
         setContent('')
         setImage(null)
         setErrors({})
       }
       if (data.error) {
-        inputEl.current.blur()
+        inputEl.current!.blur()
       }
     })
     )

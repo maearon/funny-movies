@@ -156,15 +156,15 @@ const Home: NextPage = () => {
       
       if (data.flash) {
         setFeeds()
-        inputEl.current.blur()
+        inputEl.current!.blur()
         flashMessage(...data.flash)
         setContent('')
         setImage(null)
-        inputImage.current.value = ''
+        inputImage.current!.value = ''
         setErrors([])
       }
       if (data.error) {
-        inputEl.current.blur()
+        inputEl.current!.blur()
         // setErrors(data.error)
       }
 

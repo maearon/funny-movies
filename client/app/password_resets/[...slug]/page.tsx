@@ -52,7 +52,7 @@ const Edit = (props: {params: Promise<{slug: string[]}>}) => {
         flashMessage(...response.flash as [message_type: string, message: string])
       }
       if (response.error) { // Case (2+3)
-        myRef.current.blur()
+        myRef.current!.blur()
         setState({
           ...state,
           errorMessage: response.error,
