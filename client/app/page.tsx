@@ -224,6 +224,7 @@ const Home: NextPage = () => {
       }
       if (data.error) {
         inputEl.current!.blur()
+        setErrors(data.error)
       }
     })
     )
