@@ -74,7 +74,7 @@ const New: NextPage = () => {
     )
     .then(response => {
       if (response.user) {
-        inputEl.current.blur()
+        inputEl.current!.blur()
         if (rememberMe) {
           localStorage.setItem("token", response.tokens.access.token)
           localStorage.setItem("remember_token", response.tokens.access.token)
