@@ -111,7 +111,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     setFeeds()
-  }, [page])
+  }, [page, setFeeds])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);

@@ -7,7 +7,7 @@ import Script from "next/script";
 import Header from "./layouts/header";
 import Footer from "./layouts/footer";
 import { Providers } from "@/components/providers";
-import { useInitSession } from "@/components/shared/api/hooks/useCurrentUser";
+import SessionInitializer from "./SessionInitializer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,12 +29,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useInitSession()
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>
           <ReactQueryProvider>
+            <SessionInitializer />
             <div className="App">
               <Header />
               <div className="container">

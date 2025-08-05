@@ -6,7 +6,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { selectUser } from '@/redux/session/sessionSlice';
 import { useLogout } from '@/components/shared/api/hooks/useLoginMutation';
 import { useEffect, useState } from 'react';
-import { useInitSession } from '@/components/shared/api/hooks/useCurrentUser';
+// import { useInitSession } from '@/components/shared/api/hooks/useCurrentUser';
 
 const Header: NextPage = () => {
   const router = useRouter();
@@ -19,7 +19,7 @@ const Header: NextPage = () => {
     setHasMounted(true)
   }, [])
 
-  useInitSession()
+  // useInitSession()
 
   const onClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
