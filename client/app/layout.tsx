@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Script from "next/script";
 import Header from "./layouts/header";
 import Footer from "./layouts/footer";
-import { Providers } from "@/components/providers";
+// import { Providers } from "@/components/providers";
 import { store } from "@/redux/store";
 import { fetchUser } from "@/redux/session/sessionSlice";
 import { Provider } from "react-redux";
@@ -24,10 +24,10 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
 });
 
-export const metadata = {
-  title: "Funny Movies",
-  description: "Share and enjoy funny movies",
-};
+// export const metadata = {
+//   title: "Funny Movies",
+//   description: "Share and enjoy funny movies",
+// };
 
 store.dispatch(fetchUser())
 
