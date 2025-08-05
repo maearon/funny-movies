@@ -365,7 +365,7 @@ const Home: NextPage = () => {
                 </span>
                 <span className="timestamp">
                 {'Shared '+i.timestamp+' ago. '}
-                {userData.value.id === i.user_id &&
+                {userData?.value?.id === i.user_id &&
                   <Link href={'#/microposts/'+i.id} onClick={() => removeMicropost(i.id)}>delete</Link>
                 }
                 </span>
