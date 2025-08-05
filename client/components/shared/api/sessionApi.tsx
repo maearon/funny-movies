@@ -14,7 +14,6 @@ export interface LoginField {
 
 export interface Response<User> {
   type: string
-  currentAuthority: string
   user?: User
   tokens: {
     access: {
@@ -35,7 +34,16 @@ export interface Response<User> {
   }
 }
 
+export interface ResponseSession<User> {
+  user?: User
+}
+
 const sessionApi = {
+  index(): Promise<ResponseSession<User>> {
+    const url = '/sessions';
+    return API.get(url);
+  },
+
   create(params: SessionParams): Promise<Response<User>> {
     const url = '/login';
     return API.post(url, params);

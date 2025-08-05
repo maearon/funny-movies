@@ -4,6 +4,7 @@ import { RootState } from '@/redux/store'
 // import javaService from '@/api/services/javaService'
 import { Nullable } from '@/types/common'
 import API from '@/components/shared/api';
+import sessionApi from '@/components/shared/api/sessionApi';
 
 // ---- User model định nghĩa nhất quán với BE JWT response ----
 export interface User {
@@ -37,7 +38,7 @@ export const fetchUser = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       // const response = await javaService.getCurrentSession()
-      const response = await API.get('/sessions')
+      const response = await sessionApi.index()
       // Ensure the returned user matches the User interface
       const user = response?.user
       if (user) {
@@ -45,6 +46,7 @@ export const fetchUser = createAsyncThunk(
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role,
           avatar: user.avatar ?? '',
           level: user.level ?? 'LEVEL 1',
           token: user.token ?? '',
