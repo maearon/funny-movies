@@ -68,7 +68,7 @@ const New: NextPage = () => {
     },
     {
       onSuccess: () => {
-        flashMessage("success", "Login successful.")
+        // flashMessage("success", "Login successful.")
         router.push("/")
       },
       onError: (error: any) => {
