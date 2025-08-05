@@ -1,87 +1,132 @@
-// import axios from 'axios'
+import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from "axios"
+import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "@/lib/token"
+import { Nullable } from "@/types/common"
 
-// let BASE_URL = ''
-// if (process.env.NODE_ENV === 'development') {
-//   BASE_URL = 'http://localhost:3001/api'
-// } else {
-//   BASE_URL = 'https://railstutorialapi.onrender.com/api'
-// }
+// Base URL config
+const BASE_URL = process.env.NODE_ENV === "development"
+  ? "http://localhost:9000/api"
+  : "https://adidas-microservices.onrender.com/api"
 
-// axios.defaults.xsrfCookieName = 'CSRF-TOKEN';
-
-// axios.defaults.xsrfHeaderName = 'X-CSRF-Token';
-
-// axios.defaults.withCredentials = true;
-
-// export default class API {
-//     constructor(lang = 'EN') {
-//         this.lang = lang
-//     }
-//     getHttpClient(baseURL = `${BASE_URL}`) {
-//         var headers = {
-//             'Content-Type': 'application/json',
-//             'Accept': 'application/json',
-//             'x-lang': this.lang
-//         }
-//         this.client = axios.create({
-//             baseURL: baseURL,
-//             headers: headers
-//         })
-//         return this.client
-//     }
-// }
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-
-let BASE_URL = ''
-if (process.env.NODE_ENV === 'development') {
-  BASE_URL = 'http://localhost:3001/api'
-} else {
-  BASE_URL = 'https://ruby-rails-boilerplate-3s9t.onrender.com/api'
-}
-
-axios.defaults.xsrfCookieName = 'CSRF-TOKEN';
-
-axios.defaults.xsrfHeaderName = 'X-CSRF-Token';
-
-axios.defaults.withCredentials = true;
+// CSRF & credentials setup
+axios.defaults.xsrfCookieName = "CSRF-TOKEN"
+axios.defaults.xsrfHeaderName = "X-CSRF-Token"
+axios.defaults.withCredentials = true
 
 const API = axios.create({
   baseURL: BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'x-lang': 'EN'
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "x-lang": "EN",
   },
-});
+})
 
-API.interceptors.request.use(
-  function (config: AxiosRequestConfig) {
-    if (
-      localStorage.getItem('token') && localStorage.getItem('token') !== 'undefined'
-    ) 
-    {
-      config.headers.Authorization = `Bearer ${localStorage.getItem('token')} ${localStorage.getItem('remember_token')}`
-    }
-    else if (
-      sessionStorage.getItem('token') && sessionStorage.getItem('token') !== 'undefined'
-    ) 
-    {
-      config.headers.Authorization = `Bearer ${sessionStorage.getItem('token')} ${sessionStorage.getItem('remember_token')}`
-    }
-    return config;
-  },
-  function (error) {
-    return Promise.reject(error);
+// 🔄 Redirect handler
+const dispatchRedirectToLogin = () => {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("customRedirectToLogin"))
   }
-);
+}
+
+// 🔐 Attach tokens and guest_cart_id
+API.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    if (typeof window !== "undefined" && config.headers) {
+      const token = getAccessToken()
+      if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`
+      }
+
+      const guestCartId =
+        localStorage.getItem("guest_cart_id") ?? sessionStorage.getItem("guest_cart_id")
+      if (guestCartId) {
+        const url = new URL(config.url || "", BASE_URL)
+        if (!url.searchParams.has("guest_cart_id")) {
+          url.searchParams.set("guest_cart_id", guestCartId)
+          config.url = url.pathname + "?" + url.searchParams.toString()
+        }
+      }
+    }
+    return config
+  },
+  (error) => Promise.reject(error),
+)
+
+// 🔄 Token Refresh Logic
+let isRefreshing = false
+let failedQueue: any[] = []
+
+const processQueue = (error: any, token: Nullable<string> = null) => {
+  failedQueue.forEach((prom) => {
+    error ? prom.reject(error) : prom.resolve(token)
+  })
+  failedQueue = []
+}
 
 API.interceptors.response.use(
-  function (response: AxiosResponse) {
-    return response.data;
+  (response: AxiosResponse) => {
+    if (typeof response.data === "object" && response.data !== null) {
+      return {
+        ...response,
+        _status: response.status,
+      }
+    }
+    return response
   },
-  function (error) {
-    return Promise.reject(error);
-  }
-);
+  async (error) => {
+    const originalRequest = error.config
 
-export default API;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (token: string) => {
+              originalRequest.headers["Authorization"] = `Bearer ${token}`
+              resolve(API(originalRequest))
+            },
+            reject,
+          })
+        })
+      }
+
+      isRefreshing = true
+      const refreshToken = getRefreshToken()
+
+      if (!refreshToken) {
+        clearTokens()
+        dispatchRedirectToLogin()
+        return Promise.reject(error)
+      }
+
+      try {
+        const res = await axios.post(`${BASE_URL}/refresh`, {
+          refresh_token: refreshToken,
+        })
+
+        const newToken = res.data.token
+        const newRefresh = res.data.refresh_token
+        const rememberMe = !!localStorage.getItem("token")
+
+        setTokens(newToken, newRefresh, rememberMe)
+        API.defaults.headers["Authorization"] = `Bearer ${newToken}`
+        processQueue(null, newToken)
+
+        originalRequest.headers["Authorization"] = `Bearer ${newToken}`
+        return API(originalRequest)
+      } catch (err) {
+        processQueue(err, null)
+        clearTokens()
+        dispatchRedirectToLogin()
+        return Promise.reject(err)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
+export default API
