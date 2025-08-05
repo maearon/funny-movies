@@ -56,7 +56,7 @@ const Edit = (props: {params: Promise<{id: string}>}) => {
   const [password_confirmation, setPasswordConfirmation] = useState('')
   const [errors, setErrors] = useState([] as string[])
   const [gravatar, setGravatar] = useState('')
-  const inputEl = useRef(undefined) as MutableRefObject<HTMLInputElement>
+  const inputEl = useRef(null) as MutableRefObject<HTMLInputElement>
 
   const getUserInfo= useCallback(async () => { 
     userApi.edit(id as string

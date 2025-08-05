@@ -28,8 +28,8 @@ const Home: NextPage = () => {
   const [content, setContent] = useState('')
   const [image, setImage] = useState(null)
   const [imageName, setImageName] = useState('')
-  const inputEl = useRef(undefined) as MutableRefObject<HTMLInputElement>
-  const inputImage = useRef(undefined) as MutableRefObject<HTMLInputElement>
+  const inputEl = useRef(null) as MutableRefObject<HTMLInputElement>
+  const inputImage = useRef(null) as MutableRefObject<HTMLInputElement>
   const [errors, setErrors] = useState([] as string[])
   const userData = useAppSelector(selectUser)
 
