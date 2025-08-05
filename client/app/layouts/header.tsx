@@ -1,71 +1,27 @@
 "use client";
 import type { NextPage } from 'next';
 import Link from 'next/link';
-import { fetchUser, selectUser } from '../../redux/session/sessionSlice';
+// import { fetchUser, selectUser } from '../../redux/session/sessionSlice';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+// import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import sessionApi from '../../components/shared/api/sessionApi';
 import flashMessage from '@/components/shared/flashMessages';
+import { useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/session/sessionSlice';
+import { useLogout } from '@/components/shared/api/hooks/useLoginMutation';
 
 const Header: NextPage = () => {
   const router = useRouter();
-  const current_user = useAppSelector(selectUser);
-  const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    dispatch(fetchUser()).finally(() => setLoading(false));
-  }, [dispatch]);
-  
-  useEffect(() => {
-    if (!loading && current_user?.value?.email) {
-      router.push("/");
-    }
-  }, [loading, current_user?.value?.email, router]);
+  // const current_user = useAppSelector(selectUser);
+  const { value: current_user, status } = useAppSelector(selectUser)
+  // const dispatch = useAppDispatch();
+  // const [loading, setLoading] = useState(true);
+  const loading = status === "loading"
 
   const onClick = async (e: any) => {
     e.preventDefault();
-    
-    try {
-      // Call the API to destroy the session
-      const response = await sessionApi.destroy();
-      
-      // Always clear local and session storage
-      localStorage.removeItem("token");
-      localStorage.removeItem("remember_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("accessToken");
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("remember_token");
-      sessionStorage.removeItem("refresh_token");
-      sessionStorage.removeItem("accessToken");
-      await dispatch(fetchUser()); // Fetch user data if needed
-  
-      // Check the response status
-      if (response.status === 401) {
-        flashMessage("error", "Unauthorized")
-      }
-      
-      // Redirect to home page
-      router.push("/");
-    } catch (error) {
-      // Handle error and show flash message
-      flashMessage("error", "Logout error: " + error);
-      // Always clear local and session storage
-      localStorage.removeItem("token");
-      localStorage.removeItem("remember_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("accessToken");
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("remember_token");
-      sessionStorage.removeItem("refresh_token");
-      sessionStorage.removeItem("accessToken");
-      await dispatch(fetchUser()); // Fetch user data if needed
-  
-      // Check the response status
-      flashMessage("error", "Unauthorized")
-    }
+    useLogout()
   };
 
   return (
@@ -87,9 +43,9 @@ const Header: NextPage = () => {
           <ul className="nav navbar-nav navbar-right collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             {loading ? (
               <li>Loading...</li>
-            ) : current_user?.value?.email ? (
+            ) : current_user?.email ? (
               <>
-                <li><Link href={`/users/${current_user.value.id}`}>{"Welcome " + current_user.value.email}</Link></li>
+                <li><Link href={`/users/${current_user.id}`}>{"Welcome " + current_user.email}</Link></li>
                 <li className="divider"></li>
                 <li><Link href="/share">
                   <div className="btn btn-primary">

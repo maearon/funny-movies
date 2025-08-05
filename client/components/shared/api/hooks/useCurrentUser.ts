@@ -5,6 +5,10 @@ import type { AppDispatch } from "@/redux/store"
 import { getAccessToken } from "@/lib/token"
 import { fetchUser } from "@/redux/session/sessionSlice"
 
+export const useInitSession = () => {
+  useCurrentUser()
+}
+// ------------------------
 export const useCurrentUser = () => {
   const dispatch = useDispatch<AppDispatch>()
 

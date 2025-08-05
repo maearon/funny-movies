@@ -9,8 +9,8 @@ import Skeleton from 'react-loading-skeleton'
 import micropostApi, { CreateResponse, ListResponse, Micropost } from '../components/shared/api/micropostApi'
 import ShowErrors, { ErrorMessageType } from '@/components/shared/errorMessages'
 import flashMessage from '../components/shared/flashMessages'
-import { useAppDispatch, useAppSelector } from '../redux/hooks'
-import { fetchUser, selectUser } from '../redux/session/sessionSlice'
+import { useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/session/sessionSlice';
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
@@ -31,9 +31,8 @@ const Home: NextPage = () => {
   const [imageName, setImageName] = useState('')
   const inputEl = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
-  const current_user = useAppSelector(selectUser)
-  const dispatch = useAppDispatch()
-  const [loading, setLoading] = useState(true)
+  const { value: current_user, status } = useAppSelector(selectUser)
+  const loading = status === "loading"
   const [authCode, setAuthCode] = useState<string | null>(null);
 
   const extractVideoId = (youtubeUrl: string): string | null => {
@@ -111,19 +110,6 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        await dispatch(fetchUser());
-      } catch (error) {
-        flashMessage('error', 'Failed to fetch user')
-      } finally {
-        setFeeds();
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
 
@@ -153,7 +139,7 @@ const Home: NextPage = () => {
     } else {
       flashMessage('error', 'Authorization code is missing from URL')
     }
-  }, [dispatch, setFeeds]);
+  }, [setFeeds]);
 
   const handleRate = async (videoId: any, rating: any) => {
     const accessToken = localStorage.getItem('accessToken');
@@ -259,33 +245,33 @@ const Home: NextPage = () => {
     <Skeleton height={304} />
     <Skeleton circle={true} height={60} width={60} />
     </>
-  ) : current_user.error ? (
-    <h2>{current_user.error}</h2>
-  ) : current_user?.value?.email ? (
+  ) : status === "failed" ? (
+    <h2>{status} get current_user from redux store</h2>
+  ) : current_user?.email ? (
     <div className="row">
       <aside className="col-md-4">
         <section className="user_info">
           <Image
             className={"gravatar"}
             src={"https://secure.gravatar.com/avatar/"+gravatar+"?s=50"}
-            alt={current_user.value.name} 
+            alt={current_user.name} 
             width={50}
             height={50}
             priority
           />
-          <h1>{current_user.value.name}</h1>
-          <span><Link href={"/users/"+current_user.value.id}>view my profile</Link></span>
+          <h1>{current_user.name}</h1>
+          <span><Link href={"/users/"+current_user.id}>view my profile</Link></span>
           <span>{micropost} post{micropost !== 1 ? 's' : ''}</span>
         </section>
 
         <section className="stats">
           <div className="stats">
-            <Link href={"/users/"+current_user.value.id+"/following"}>
+            <Link href={"/users/"+current_user.id+"/following"}>
               <strong id="following" className="stat">
                 {following}
               </strong> following
             </Link>
-            <Link href={"/users/"+current_user.value.id+"/followers"}>
+            <Link href={"/users/"+current_user.id+"/followers"}>
               <strong id="followers" className="stat">
                 {followers}
               </strong> followers
@@ -365,7 +351,7 @@ const Home: NextPage = () => {
                 </span>
                 <span className="timestamp">
                 {'Shared '+i.timestamp+' ago. '}
-                {current_user?.value?.id === i.user_id &&
+                {current_user?.id === i.user_id &&
                   <Link href={'#/microposts/'+i.id} onClick={() => removeMicropost(i.id)}>delete</Link>
                 }
                 </span>

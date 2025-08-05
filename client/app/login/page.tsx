@@ -3,26 +3,28 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, {  useEffect, useRef, useState } from 'react'
-import { fetchUser, selectUser, User } from '../../redux/session/sessionSlice'
 import sessionApi, { Response } from '../../components/shared/api/sessionApi'
 import flashMessage from '../../components/shared/flashMessages'
 import { ErrorMessage, Field, Form, Formik, FormikProps, useFormik, withFormik } from 'formik'
 import * as Yup from 'yup'
 // import TextError from '../../components/shared/TextError'
 import ShowErrors, { ErrorMessageType } from '@/components/shared/errorMessages';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/session/sessionSlice';
+import { useLoginMutation } from '@/components/shared/api/hooks/useLoginMutation';
+import { handleApiError } from '@/components/shared/handleApiError';
 
 const initialValues = {
   email: '',
   password: '',
-  rememberMe: '1',
+  remember_me: true,
   errors: [] as string[],
 }
 
 interface MyFormValues {
   email: string
   password: string
-  rememberMe: string
+  remember_me: boolean
   errors: string[]
 }
 
@@ -33,62 +35,47 @@ const New: NextPage = () => {
   const [rememberMe, setRememberme] = useState(true)
   const inputEl = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
-  const dispatch = useAppDispatch()
-  const [loading, setLoading] = useState(true)
-  const current_user = useAppSelector(selectUser)
+  const { value: current_user, status } = useAppSelector(selectUser)
+  const loading = status === "loading"
+  const [keepLoggedIn, setKeepLoggedIn] = useState(true)
+  const loginMutation = useLoginMutation()
   
   useEffect(() => {
-    dispatch(fetchUser()).finally(() => setLoading(false));
-  }, [dispatch]);
-  
-  useEffect(() => {
-    if (!loading && current_user?.value?.email) {
+    if (!loading && current_user?.email) {
       router.push("/");
     }
-  }, [loading, current_user?.value?.email, router]);
+  }, [loading, current_user?.email, router]);
 
   const validationSchema = Yup.object({
     email: Yup.string()
       .email('Invalid email format')
       .required('Required'),
-    password: Yup.string().required('Required')
+    password: Yup.string().required('Required'),
+    remember_me: Yup.boolean()
   })
 
-  const onSubmit = (values: MyFormValues) => {
-    flashMessage("error", "User or password incorrect")
-    sessionApi.create(
-      {
-        session: {
-          email: values.email,
-          password: values.password
-        }
-      }
-    )
-    .then(response => {
-      if (response.user) {
-        inputEl.current!.blur()
-        if (rememberMe) {
-          localStorage.setItem("token", response.tokens.access.token)
-          localStorage.setItem("remember_token", response.tokens.access.token)
-        } else {
-          sessionStorage.setItem("token", response.tokens.access.token)
-          sessionStorage.setItem("remember_token", response.tokens.access.token)
-        }
-        dispatch(fetchUser())
+  const onSubmit = async (values: { email: string; password: string; remember_me: boolean }) => {
+    setErrors({})
+    setKeepLoggedIn(values.remember_me)
+
+    const { email, password } = values
+
+    loginMutation.mutate(
+    {
+      email,
+      password,
+      keepLoggedIn: keepLoggedIn
+    },
+    {
+      onSuccess: () => {
+        flashMessage("success", "Login successful.")
         router.push("/")
-      }
-      if (response.flash) {
-        flashMessage(...response.flash)
-      }
-      if (response.status === 401) {
-        setErrors(response.errors)
-        console.log('error1', response.errors)
-      }
-    })
-    .catch(error => {
-      flashMessage("error", error.toString())
-      setErrors({email: ["or password incorrect"]})
-      console.log('error2', error)
+      },
+      onError: (error: any) => {
+        const parsed = handleApiError(error)
+        setErrors(parsed)
+        if (parsed?.general?.[0]) flashMessage("error", parsed.general[0])
+      },
     })
   }
 
@@ -96,9 +83,9 @@ const New: NextPage = () => {
     <>
     <div>Loading...</div>
     </>
-  ) : current_user.error ? (
-    <h2>{current_user.error}</h2>
-  ) : current_user?.value?.email ? (
+  ) : status === "failed" ? (
+    <h2>{status} to get current_user from redux store</h2>
+  ) : current_user?.email ? (
     <>
     <div>You did login, you now should in Home not Login...</div>
     </>

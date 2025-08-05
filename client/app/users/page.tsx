@@ -3,8 +3,8 @@ import type { NextPage } from 'next'
 import Image from 'next/image'
 import React, { useCallback, useEffect, useState } from 'react'
 import Pagination from 'react-js-pagination'
-import { useAppSelector } from '../../redux/hooks'
-import { selectUser } from '../../redux/session/sessionSlice'
+import { useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/session/sessionSlice';
 import userApi, { User } from '../../components/shared/api/userApi'
 import flashMessage from '../../components/shared/flashMessages'
 import { request, gql } from 'graphql-request'
@@ -14,7 +14,8 @@ const Index: NextPage = () => {
   const [users, setUsers] = useState([] as User[])
   const [page, setPage] = useState(1)
   const [total_count, setTotalCount] = useState(1)
-  const current_user = useAppSelector(selectUser);
+  const { value: current_user, status } = useAppSelector(selectUser)
+  const loading = status === "loading"
 
   const setUsersList= useCallback(async () => { 
     userApi.index({page: page}
@@ -83,7 +84,7 @@ const Index: NextPage = () => {
         />
         <a href={'/users/'+u.id}>{u.name}</a>
         {
-          current_user?.value?.role && current_user.value.id !== u.id ? (
+          current_user?.role && current_user.id !== u.id ? (
             <>
             | <a href={'#/users/'+u.id} onClick={() => removeUser(i, u.id)}>delete</a>
             </>

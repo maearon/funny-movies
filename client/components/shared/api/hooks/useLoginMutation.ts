@@ -13,10 +13,6 @@ import { fetchUser, logout } from "@/redux/session/sessionSlice"
 import sessionApi from "../sessionApi"
 import flashMessage from "../../flashMessages"
 
-export const useInitSession = () => {
-  useCurrentUser()
-}
-// ------------------------
 export function useLogout() {
   const dispatch = useDispatch<AppDispatch>()
 

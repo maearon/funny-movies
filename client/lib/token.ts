@@ -11,10 +11,18 @@ export const setTokens = (access: string, refresh: string, keepLoggedIn: boolean
 
 export const clearTokens = () => {
   if (typeof window !== "undefined") {
-    localStorage.removeItem("token")
-    localStorage.removeItem("refresh_token")
-    sessionStorage.removeItem("token")
-    sessionStorage.removeItem("refresh_token")
+    // localStorage.removeItem("token")
+    // localStorage.removeItem("refresh_token")
+    // sessionStorage.removeItem("token")
+    // sessionStorage.removeItem("refresh_token")
+    localStorage.removeItem("token");
+    localStorage.removeItem("remember_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("accessToken");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("remember_token");
+    sessionStorage.removeItem("refresh_token");
+    sessionStorage.removeItem("accessToken");
   }
 }
 

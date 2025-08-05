@@ -6,12 +6,13 @@ import Header from './layouts/header'
 import Footer from './layouts/footer'
 import { Provider } from 'react-redux'
 import { store } from '../redux/store'
-import { fetchUser } from '../redux/session/sessionSlice'
+// import { fetchUser } from '../redux/session/sessionSlice'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import localFont from "next/font/local";
 import Script from "next/script";
 import ReactQueryProvider from './ReactQueryProvider';
+import { useInitSession } from '@/components/shared/api/hooks/useCurrentUser';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,7 +23,7 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
 });
 
-store.dispatch(fetchUser())
+useInitSession()
 
 export default function RootLayout({
   children,

@@ -9,8 +9,8 @@ import Skeleton from 'react-loading-skeleton'
 import micropostApi, { CreateResponse, ListResponse, Micropost } from '../../components/shared/api/micropostApi'
 import errorMessage from '../../components/shared/errorMessages'
 import flashMessage from '../../components/shared/flashMessages'
-import { useAppSelector } from '../../redux/hooks'
-import { selectUser } from '../../redux/session/sessionSlice'
+import { useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/session/sessionSlice';
 // Alt + Shift + O
 
 // interface Props {
@@ -31,7 +31,8 @@ const Home: NextPage = () => {
   const inputEl = useRef<HTMLInputElement>(null)
   const inputImage = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState([] as string[])
-  const current_user = useAppSelector(selectUser)
+  const { value: current_user, status } = useAppSelector(selectUser)
+  const loading = status === "loading"
 
   const extractVideoId = (youtubeUrl: string): string | null => {
     const regExp = /embed\/([^?]*)/;
@@ -97,8 +98,8 @@ const Home: NextPage = () => {
   }, [page])
 
   useEffect(() => {
-    if (current_user.loggedIn) { setFeeds()}
-  }, [setFeeds, current_user.loggedIn])
+    if (current_user?.email) { setFeeds()}
+  }, [setFeeds, current_user?.email])
 
   const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
     setPage(pageNumber)
@@ -188,38 +189,38 @@ const Home: NextPage = () => {
     }
   }
 
-  return current_user.status === 'failed' ? (
+  return loading ? (
     <>
     <Skeleton height={304} />
     <Skeleton circle={true} height={60} width={60} />
     </>
-  ) : current_user.error ? (
-    <h2>{current_user.error}</h2>
-  ) : current_user.loggedIn ? (
+  ) : status === 'failed' ? (
+    <h2>{status === 'failed'} get current_user from redux store</h2>
+  ) : current_user?.email ? (
     <div className="row">
       <aside className="col-md-4 col-md-offset-4">
         {/* <section className="user_info">
           <Image
             className={"gravatar"}
             src={"https://secure.gravatar.com/avatar/"+gravatar+"?s=50"}
-            alt={current_user.value.name} 
+            alt={current_user.name} 
             width={50}
             height={50}
             priority
           />
-          <h1>{current_user.value.name}</h1>
-          <span><Link href={"/users/"+current_user.value.id}>view my profile</Link></span>
+          <h1>{current_user.name}</h1>
+          <span><Link href={"/users/"+current_user.id}>view my profile</Link></span>
           <span>{micropost} micropost{micropost !== 1 ? 's' : ''}</span>
         </section>
 
         <section className="stats">
           <div className="stats">
-            <Link href={"/users/"+current_user.value.id+"/following"}>
+            <Link href={"/users/"+current_user.id+"/following"}>
               <strong id="following" className="stat">
                 {following}
               </strong> following
             </Link>
-            <Link href={"/users/"+current_user.value.id+"/followers"}>
+            <Link href={"/users/"+current_user.id+"/followers"}>
               <strong id="followers" className="stat">
                 {followers}
               </strong> followers

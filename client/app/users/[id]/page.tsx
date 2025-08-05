@@ -3,8 +3,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState, use } from 'react';
 import Pagination from 'react-js-pagination';
-import { useAppSelector } from '../../../redux/hooks';
-import { selectUser } from '../../../redux/session/sessionSlice';
+import { useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/session/sessionSlice';
 import micropostApi, { Micropost } from '../../../components/shared/api/micropostApi';
 import relationshipApi from '../../../components/shared/api/relationshipApi';
 import userApi, { UserShow } from '../../../components/shared/api/userApi';
@@ -19,7 +19,8 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
   const [idRelationships, setIdRelationships] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(1);
-  const current_user = useAppSelector(selectUser);
+  const { value: current_user, status } = useAppSelector(selectUser)
+  const loading = status === "loading"
   const router = useRouter();
   const id = params.id;
 
@@ -127,7 +128,7 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
       </aside>
 
       <div className="col-md-8">
-        {current_user && current_user?.value?.id !== id && (
+        {current_user && current_user?.id !== id && (
           <FollowForm
             id={id}
             user={user}
@@ -168,7 +169,7 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
                   </span>
                   <span className="timestamp">
                     {`Posted ${micropost.timestamp} ago. `}
-                    {current_user?.value?.id === micropost.user_id && (
+                    {current_user?.id === micropost.user_id && (
                       <Link href={`#/microposts/${micropost.id}`} onClick={() => removeMicropost(micropost.id)}>
                         delete
                       </Link>

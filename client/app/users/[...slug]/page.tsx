@@ -2,8 +2,8 @@
 import Image from "next/image";
 import Link from 'next/link'
 import { SetStateAction, useCallback, useEffect, useState, use } from 'react';
-import { useAppSelector } from '../../../redux/hooks'
-import { selectUser } from '../../../redux/session/sessionSlice'
+import { useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/session/sessionSlice';
 import userApi, { IUserFollow, UserFollow } from '../../../components/shared/api/userApi'
 import flashMessage from '../../../components/shared/flashMessages'
 import Pagination from 'react-js-pagination'
@@ -14,7 +14,8 @@ const ShowFollow = (props: {params: Promise<{slug: string[]}>}) => {
   const [xusers, setXusers] = useState([] as UserFollow[])
   const [page, setPage] = useState(1)
   const [total_count, setTotalCount] = useState(1)
-  const current_user = useAppSelector(selectUser)
+  const { value: current_user, status } = useAppSelector(selectUser)
+  const loading = status === "loading"
   const [user, setUser] = useState({} as IUserFollow)
   const { id, follow } = params.slug.length === 2 ? { id: params.slug[0], follow: params.slug[1] } : { id: '', follow: '' };
 
@@ -126,7 +127,7 @@ const ShowFollow = (props: {params: Promise<{slug: string[]}>}) => {
           />
           <Link href={'/users/'+u.id}>{u.name}</Link>
           {
-            current_user?.value?.role && current_user.value.id !== u.id ? (
+            current_user?.role && current_user.id !== u.id ? (
               <>
               | <Link href={'#/users/'+u.id} onClick={() => removeUser(u.id)}>delete</Link>
               </>
