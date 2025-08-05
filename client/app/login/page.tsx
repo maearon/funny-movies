@@ -35,17 +35,17 @@ const New: NextPage = () => {
   const [errors, setErrors] = useState<ErrorMessageType>({});
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
-  const userData = useAppSelector(selectUser)
+  const current_user = useAppSelector(selectUser)
   
   useEffect(() => {
     dispatch(fetchUser()).finally(() => setLoading(false));
   }, [dispatch]);
   
   useEffect(() => {
-    if (!loading && userData?.value?.email) {
+    if (!loading && current_user?.value?.email) {
       router.push("/");
     }
-  }, [loading, userData?.value?.email, router]);
+  }, [loading, current_user?.value?.email, router]);
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -97,9 +97,9 @@ const New: NextPage = () => {
     <>
     <div>Loading...</div>
     </>
-  ) : userData.error ? (
-    <h2>{userData.error}</h2>
-  ) : userData?.value?.email ? (
+  ) : current_user.error ? (
+    <h2>{current_user.error}</h2>
+  ) : current_user?.value?.email ? (
     <>
     <div>You did login, you now should in Home not Login...</div>
     </>

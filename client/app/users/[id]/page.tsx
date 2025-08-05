@@ -19,7 +19,7 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
   const [idRelationships, setIdRelationships] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(1);
-  const currentUser = useAppSelector(selectUser);
+  const current_user = useAppSelector(selectUser);
   const router = useRouter();
   const id = params.id;
 
@@ -127,7 +127,7 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
       </aside>
 
       <div className="col-md-8">
-        {currentUser && currentUser?.value?.id !== id && (
+        {current_user && current_user?.value?.id !== id && (
           <FollowForm
             id={id}
             user={user}
@@ -168,7 +168,7 @@ const Show = (props: { params: Promise<{ id: string }> }) => {
                   </span>
                   <span className="timestamp">
                     {`Posted ${micropost.timestamp} ago. `}
-                    {currentUser?.value?.id === micropost.user_id && (
+                    {current_user?.value?.id === micropost.user_id && (
                       <Link href={`#/microposts/${micropost.id}`} onClick={() => removeMicropost(micropost.id)}>
                         delete
                       </Link>

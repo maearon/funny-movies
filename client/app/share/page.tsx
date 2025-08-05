@@ -14,7 +14,7 @@ import { selectUser } from '../../redux/session/sessionSlice'
 // Alt + Shift + O
 
 // interface Props {
-//   userData: UserState;
+//   current_user: UserState;
 // }
 
 const Home: NextPage = () => {
@@ -31,7 +31,7 @@ const Home: NextPage = () => {
   const inputEl = useRef<HTMLInputElement>(null)
   const inputImage = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState([] as string[])
-  const userData = useAppSelector(selectUser)
+  const current_user = useAppSelector(selectUser)
 
   const extractVideoId = (youtubeUrl: string): string | null => {
     const regExp = /embed\/([^?]*)/;
@@ -97,8 +97,8 @@ const Home: NextPage = () => {
   }, [page])
 
   useEffect(() => {
-    if (userData.loggedIn) { setFeeds()}
-  }, [setFeeds, userData.loggedIn])
+    if (current_user.loggedIn) { setFeeds()}
+  }, [setFeeds, current_user.loggedIn])
 
   const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
     setPage(pageNumber)
@@ -188,38 +188,38 @@ const Home: NextPage = () => {
     }
   }
 
-  return userData.status === 'failed' ? (
+  return current_user.status === 'failed' ? (
     <>
     <Skeleton height={304} />
     <Skeleton circle={true} height={60} width={60} />
     </>
-  ) : userData.error ? (
-    <h2>{userData.error}</h2>
-  ) : userData.loggedIn ? (
+  ) : current_user.error ? (
+    <h2>{current_user.error}</h2>
+  ) : current_user.loggedIn ? (
     <div className="row">
       <aside className="col-md-4 col-md-offset-4">
         {/* <section className="user_info">
           <Image
             className={"gravatar"}
             src={"https://secure.gravatar.com/avatar/"+gravatar+"?s=50"}
-            alt={userData.value.name} 
+            alt={current_user.value.name} 
             width={50}
             height={50}
             priority
           />
-          <h1>{userData.value.name}</h1>
-          <span><Link href={"/users/"+userData.value.id}>view my profile</Link></span>
+          <h1>{current_user.value.name}</h1>
+          <span><Link href={"/users/"+current_user.value.id}>view my profile</Link></span>
           <span>{micropost} micropost{micropost !== 1 ? 's' : ''}</span>
         </section>
 
         <section className="stats">
           <div className="stats">
-            <Link href={"/users/"+userData.value.id+"/following"}>
+            <Link href={"/users/"+current_user.value.id+"/following"}>
               <strong id="following" className="stat">
                 {following}
               </strong> following
             </Link>
-            <Link href={"/users/"+userData.value.id+"/followers"}>
+            <Link href={"/users/"+current_user.value.id+"/followers"}>
               <strong id="followers" className="stat">
                 {followers}
               </strong> followers
@@ -298,8 +298,8 @@ export default Home
 
 // export const getServerSideProps: GetServerSideProps = async () => {
 //   try {
-//     const userData = useAppSelector(selectUser);
-//     return { userData }
+//     const current_user = useAppSelector(selectUser);
+//     return { current_user }
 //   } catch {
 //     return {
 //       props: {}

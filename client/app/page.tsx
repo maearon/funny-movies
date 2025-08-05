@@ -31,7 +31,7 @@ const Home: NextPage = () => {
   const [imageName, setImageName] = useState('')
   const inputEl = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<ErrorMessageType>({});
-  const userData = useAppSelector(selectUser)
+  const current_user = useAppSelector(selectUser)
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
   const [authCode, setAuthCode] = useState<string | null>(null);
@@ -259,33 +259,33 @@ const Home: NextPage = () => {
     <Skeleton height={304} />
     <Skeleton circle={true} height={60} width={60} />
     </>
-  ) : userData.error ? (
-    <h2>{userData.error}</h2>
-  ) : userData?.value?.email ? (
+  ) : current_user.error ? (
+    <h2>{current_user.error}</h2>
+  ) : current_user?.value?.email ? (
     <div className="row">
       <aside className="col-md-4">
         <section className="user_info">
           <Image
             className={"gravatar"}
             src={"https://secure.gravatar.com/avatar/"+gravatar+"?s=50"}
-            alt={userData.value.name} 
+            alt={current_user.value.name} 
             width={50}
             height={50}
             priority
           />
-          <h1>{userData.value.name}</h1>
-          <span><Link href={"/users/"+userData.value.id}>view my profile</Link></span>
+          <h1>{current_user.value.name}</h1>
+          <span><Link href={"/users/"+current_user.value.id}>view my profile</Link></span>
           <span>{micropost} post{micropost !== 1 ? 's' : ''}</span>
         </section>
 
         <section className="stats">
           <div className="stats">
-            <Link href={"/users/"+userData.value.id+"/following"}>
+            <Link href={"/users/"+current_user.value.id+"/following"}>
               <strong id="following" className="stat">
                 {following}
               </strong> following
             </Link>
-            <Link href={"/users/"+userData.value.id+"/followers"}>
+            <Link href={"/users/"+current_user.value.id+"/followers"}>
               <strong id="followers" className="stat">
                 {followers}
               </strong> followers
@@ -365,7 +365,7 @@ const Home: NextPage = () => {
                 </span>
                 <span className="timestamp">
                 {'Shared '+i.timestamp+' ago. '}
-                {userData?.value?.id === i.user_id &&
+                {current_user?.value?.id === i.user_id &&
                   <Link href={'#/microposts/'+i.id} onClick={() => removeMicropost(i.id)}>delete</Link>
                 }
                 </span>

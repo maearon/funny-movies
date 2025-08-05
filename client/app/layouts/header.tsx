@@ -10,7 +10,7 @@ import flashMessage from '@/components/shared/flashMessages';
 
 const Header: NextPage = () => {
   const router = useRouter();
-  const userData = useAppSelector(selectUser);
+  const current_user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
@@ -19,10 +19,10 @@ const Header: NextPage = () => {
   }, [dispatch]);
   
   useEffect(() => {
-    if (!loading && userData?.value?.email) {
+    if (!loading && current_user?.value?.email) {
       router.push("/");
     }
-  }, [loading, userData?.value?.email, router]);
+  }, [loading, current_user?.value?.email, router]);
 
   const onClick = async (e: any) => {
     e.preventDefault();
@@ -87,9 +87,9 @@ const Header: NextPage = () => {
           <ul className="nav navbar-nav navbar-right collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             {loading ? (
               <li>Loading...</li>
-            ) : userData?.value?.email ? (
+            ) : current_user?.value?.email ? (
               <>
-                <li><Link href={`/users/${userData.value.id}`}>{"Welcome " + userData.value.email}</Link></li>
+                <li><Link href={`/users/${current_user.value.id}`}>{"Welcome " + current_user.value.email}</Link></li>
                 <li className="divider"></li>
                 <li><Link href="/share">
                   <div className="btn btn-primary">
