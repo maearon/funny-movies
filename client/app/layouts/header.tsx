@@ -5,13 +5,21 @@ import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectUser } from '@/redux/session/sessionSlice';
 import { useLogout } from '@/components/shared/api/hooks/useLoginMutation';
+import { useEffect, useState } from 'react';
+import { useInitSession } from '@/components/shared/api/hooks/useCurrentUser';
 
 const Header: NextPage = () => {
   const router = useRouter();
   const { value: current_user, status } = useAppSelector(selectUser);
   const loading = status === "loading";
-
+  const [hasMounted, setHasMounted] = useState(false)
   const logout = useLogout();
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  useInitSession()
 
   const onClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();

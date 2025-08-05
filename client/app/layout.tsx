@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 import Script from "next/script";
 import Header from "./layouts/header";
 import Footer from "./layouts/footer";
-import SessionInitializer from "./SessionInitializer"; // ✅ added
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,7 +34,6 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Provider store={store}>
           <ReactQueryProvider>
-            <SessionInitializer /> {/* ✅ hook chạy trong client component */}
             <div className="App">
               <Header />
               <div className="container">
