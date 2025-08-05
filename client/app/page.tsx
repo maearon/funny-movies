@@ -245,8 +245,6 @@ const Home: NextPage = () => {
     <Skeleton height={304} />
     <Skeleton circle={true} height={60} width={60} />
     </>
-  ) : status === "failed" ? (
-    <h2>{status} get current_user from redux store</h2>
   ) : current_user?.email ? (
     <div className="row">
       <aside className="col-md-4">

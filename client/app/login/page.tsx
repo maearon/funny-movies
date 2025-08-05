@@ -83,8 +83,6 @@ const New: NextPage = () => {
     <>
     <div>Loading...</div>
     </>
-  ) : status === "failed" ? (
-    <h2>{status} to get current_user from redux store</h2>
   ) : current_user?.email ? (
     <>
     <div>You did login, you now should in Home not Login...</div>
