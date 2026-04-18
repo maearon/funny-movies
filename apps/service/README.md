@@ -22,3 +22,9 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+```
+rails g model User name:string email:string password_digest:string
+rails g model Micropost content:string title:string youtube_id:string user:references
+rails g model Relationship follower_id:integer followed_id:integer
+```
