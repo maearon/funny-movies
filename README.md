@@ -3,6 +3,11 @@
 ## Introduction
 
 Web to post your favorite Youtube embed link Save and History them.
+Project structure:
+- apps/web: React frontend
+- apps/service: Rails backend (with ActionCable)
+https://www.youtube.com/watch?v=pRdv7lDoqIo&list=RDMMH4BB9eGUEaE&index=8
+https://www.youtube.com/embed/pRdv7lDoqIo?si=l43z5RVM1Df8ioYD
 
 ---
 
@@ -14,23 +19,30 @@ NPM 11.12.1
 NodeJS v25.9.0
 Ubuntu Subsystem Win11
 VSCode 1.115.0
-ruby "3.4.2"
-Rails version: 8.0.2
+ruby "4.0.2"
+Rails version: 8.1.3
 
 ---
 
 ## Installation & Configuration:
-
+```
 git clone git@github.com:maearon/remitano-test.git
+```
 install Docker Desktop (If win10/win11) https://www.docker.com/products/docker-desktop/ 
 install Linux on Windows with WSL https://learn.microsoft.com/vi-vn/windows/wsl/install
 install ruby "3.4.2" Rails version: 8.0.2 https://gorails.com/setup/windows/11
+```
+cd /mnt/c/Users/manhn/CODE/REMITANO-TEST/apps
+rails new service -d postgresql --api
+```
 
 ---
 
 ## Database Setup
 no need action create one if you need a new on https://neon.com/
+```
 postgres://default:z9GYTlrXa8Qx@ep-bold-voice-a4yp8xc9-pooler.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require
+```
 
 ---
 
@@ -55,3 +67,16 @@ deploy Backend apps/service to Render with docker mode
 ---
 
 ## Troubleshooting
+
+```
+sudo apt clean
+sudo apt update
+sudo apt --fix-missing update
+sudo apt upgrade -y
+sudo apt install xdg-utils
+xdg-open .
+explorer.exe .
+manhn@DESKTOP-96F067C:/mnt/c/Users/manhn/CODE/REMITANO-TEST/apps/service$ ls
+Gemfile
+git rm -r --cached .
+```

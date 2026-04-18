@@ -1,0 +1,9 @@
+# See https://git-scm.com/docs/gitattributes for more about git attribute files.
+
+# Mark the database schema as having been generated.
+apps/service/db/schema.rb linguist-generated
+
+# Mark any vendored files as having been vendored.
+apps/service/vendor/* linguist-vendored
+apps/service/config/credentials/*.yml.enc diff=rails_credentials
+apps/service/config/credentials.yml.enc diff=rails_credentials
