@@ -6,7 +6,11 @@ class Jwt::User::DecodeTokenService
     @auth_header = auth_header
   end
 
-  def self.call
+  def self.call(auth_header) # to .call
+    new(auth_header).call
+  end
+
+  def call  
     id_from_claim
   end
 

@@ -39,7 +39,13 @@ bundle add jwt
 mkdir -p app/services/jwt/user
 touch app/services/jwt/user/encode_token_service.rb
 touch app/services/jwt/user/decode_token_service.rb
-touch app/services/jwt/user/user_jwt_claims.rb
+touch app/models/concerns/user_jwt_claims.rb
+mkdir -p app/views/api/sessions
+touch app/views/api/sessions/create.json.jbuilder
+touch app/views/api/sessions/index.json.jbuilder
+mkdir -p app/views/api/static_pages
+touch app/views/api/static_pages/home.json.jbuilder
+bundle add kaminari
 ```
 
 ---
