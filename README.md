@@ -34,6 +34,7 @@ install ruby "3.4.2" Rails version: 8.0.2 https://gorails.com/setup/windows/11
 ```
 cd /mnt/c/Users/manhn/CODE/REMITANO-TEST/apps
 rails new service -d postgresql --api
+bundle add dotenv-rails
 ```
 
 ---
@@ -78,5 +79,10 @@ xdg-open .
 explorer.exe .
 manhn@DESKTOP-96F067C:/mnt/c/Users/manhn/CODE/REMITANO-TEST/apps/service$ ls
 Gemfile
+rm -rf apps/service/.git
 git rm -r --cached .
+```
+Reload VSCode
+```
+Ctrl + Shift + P → Reload Window
 ```
