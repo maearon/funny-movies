@@ -28,4 +28,7 @@ rails g model User name:string email:string password_digest:string  --skip-migra
 rails g model Micropost content:string title:string youtube_id:string user:references  --skip-migration
 rails g model Relationship follower_id:integer followed_id:integer  --skip-migration
 rails g model Notification --skip-migration
+rails g controller api/microposts index create
+rails g job notify_users
+rails g channel notification
 ```
