@@ -11,6 +11,8 @@
         "pooler",
         "remitano",
         "sslmode",
+        "starttls",
+        "urlsafe",
         "verceldb"
     ]
 }

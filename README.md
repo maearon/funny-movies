@@ -47,6 +47,13 @@ mkdir -p app/views/api/static_pages
 touch app/views/api/static_pages/home.json.jbuilder
 bundle add kaminari
 ```
+```
+rails generate mailer UserMailer
+touch app/views/user_mailer/account_activation.html.erb
+touch app/views/user_mailer/account_activation.text.erb
+touch app/views/user_mailer/password_reset.html.erb
+touch app/views/user_mailer/password_reset.text.erb
+```
 Create API key on https://console.cloud.google.com/apis/credentials to get Data From Youtube API V3
 
 ---
