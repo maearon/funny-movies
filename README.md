@@ -86,3 +86,17 @@ Reload VSCode
 ```
 Ctrl + Shift + P → Reload Window
 ```
+👉 In the new Ruby/Rails (Rails 8 + Ruby 4),
+`get` now only accepts one argument, unlike the previous method of passing multiple symbols.
+```
+member do
+  get :following, :followers
+end
+```
+need to
+```
+member do
+  get :following
+  get :followers
+end
+```
