@@ -29,6 +29,20 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
+  # define SMTP settings for Action Mailer to send emails through Gmail's SMTP server.
+  config.action_mailer.delivery_method = :smtp
+
+  # Configure SMTP settings for Gmail. Note: In production, you should use environment variables to store sensitive information like email and password instead of hardcoding them. 
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    domain: 'example.com',
+    user_name: ENV['SMTP_USERNAME'],
+    password:  ENV['SMTP_PASSWORD'],
+    authentication: 'plain',
+    enable_starttls_auto: true
+  }
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
