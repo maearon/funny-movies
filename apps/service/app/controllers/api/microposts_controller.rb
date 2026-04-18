@@ -16,7 +16,7 @@ class Api::MicropostsController < Api::ApiController
   end
   private
     def micropost_params
-      params.require(:micropost).permit(:content, :title, :youtube_id)
+      params.require(:micropost).permit(:content) # :title, :youtube_id
     end
     def correct_user
       @micropost = current_user.microposts.find_by(id: params[:id])

@@ -47,6 +47,7 @@ mkdir -p app/views/api/static_pages
 touch app/views/api/static_pages/home.json.jbuilder
 bundle add kaminari
 ```
+Create API key on https://console.cloud.google.com/apis/credentials to get Data From Youtube API V3
 
 ---
 
