@@ -31,3 +31,45 @@
 # Ignore key files for decrypting credentials and more.
 /apps/service/config/*.key
 
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/apps/web/node_modules
+/apps/web/.pnp
+/apps/web/.pnp.*
+/apps/web/.yarn/*
+!apps/web/.yarn/patches
+!apps/web/.yarn/plugins
+!apps/web/.yarn/releases
+!apps/web/.yarn/versions
+
+# testing
+/apps/web/coverage
+
+# next.js
+/apps/web/.next/
+/apps/web/out/
+
+# production
+/apps/web/build
+
+# misc
+apps/web/.DS_Store
+apps/web/*.pem
+
+# debug
+apps/web/npm-debug.log*
+apps/web/yarn-debug.log*
+apps/web/yarn-error.log*
+apps/web/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+apps/web/.env*
+
+# vercel
+apps/web/.vercel
+
+# typescript
+apps/web/*.tsbuildinfo
+apps/web/next-env.d.ts
+
