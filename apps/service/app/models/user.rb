@@ -1,5 +1,11 @@
 class User < ApplicationRecord
+  # Associations
+  include RefreshTokenUpdatable
+  # == Associations
   has_many :microposts, dependent: :destroy
+
+  # accessor for tokens
+  attr_accessor :token, :token_expiration_at
 
   # Follow system
   has_many :active_relationships,
@@ -52,6 +58,25 @@ class User < ApplicationRecord
     Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id", user_id: id)
              .includes(:user)
              .order(created_at: :desc)
+  end
+
+  # Token generation
+  def generate_tokens!
+    access_token, access_token_expiration_at, refresh_token, refresh_token_expiration_at = Jwt::User::EncodeTokenService.call(id)
+    update_refresh_token!(refresh_token, refresh_token_expiration_at)
+    self.token = access_token
+    self.token_expiration_at = access_token_expiration_at
+  end
+
+  # Returns true if the given token matches the digest.
+  def valid_password?(password)
+    authenticate(password)
+  end
+
+  def authenticated?(attribute, token)
+    digest = send("#{attribute}_digest")
+    return false if digest.nil?
+    BCrypt::Password.new(digest).is_password?(token)
   end
 
   # Follow logic

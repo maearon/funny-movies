@@ -35,6 +35,11 @@ install ruby "3.4.2" Rails version: 8.0.2 https://gorails.com/setup/windows/11
 cd /mnt/c/Users/manhn/CODE/REMITANO-TEST/apps
 rails new service -d postgresql --api
 bundle add dotenv-rails
+bundle add jwt
+mkdir -p app/services/jwt/user
+touch app/services/jwt/user/encode_token_service.rb
+touch app/services/jwt/user/decode_token_service.rb
+touch app/services/jwt/user/user_jwt_claims.rb
 ```
 
 ---

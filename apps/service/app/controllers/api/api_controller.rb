@@ -1,12 +1,6 @@
 class Api::ApiController < ActionController::API
-  helper_method :current_user
   include ResponsesHandler
   include ErrorsHandler
-  include ActionController::RequestForgeryProtection
-
-  protect_from_forgery with: :exception
-  
-  skip_before_action :verify_authenticity_token
 
   private
 
@@ -15,7 +9,9 @@ class Api::ApiController < ActionController::API
   end
 
   def error_message(error_message_key, options = nil)
-    options.nil? ? I18n.t(error_message_key, scope: %i[errors messages]) : I18n.t(error_message_key, scope: %i[errors messages], **options)
+    options.nil? ?
+      I18n.t(error_message_key, scope: %i[errors messages]) :
+      I18n.t(error_message_key, scope: %i[errors messages], **options)
   end
 
   def authenticate!
@@ -27,8 +23,10 @@ class Api::ApiController < ActionController::API
   end
 
   def current_user
-    user_id = Jwt::User::DecodeTokenService.call(request.headers['Authorization'])
-    User.find_by(id: user_id) if user_id
+    @current_user ||= begin
+      user_id = Jwt::User::DecodeTokenService.call(request.headers['Authorization'])
+      User.find_by(id: user_id) if user_id
+    end
   end
 
   def current_user_token
