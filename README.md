@@ -55,6 +55,12 @@ touch app/views/user_mailer/password_reset.html.erb
 touch app/views/user_mailer/password_reset.text.erb
 ```
 Create API key on https://console.cloud.google.com/apis/credentials to get Data From Youtube API V3
+```
+npm i @reduxjs/toolkit axios formik react-js-pagination react-loading-skeleton react-redux react-toastify redux yup @tanstack/query-async-storage-persister @tanstack/react-query @tanstack/react-query-devtools @tanstack/react-query-persist-client
+```
+```
+npm i --save-dev @types/react-js-pagination
+```
 
 ---
 
