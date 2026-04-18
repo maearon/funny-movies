@@ -24,7 +24,8 @@ Things you may want to cover:
 * ...
 
 ```
-rails g model User name:string email:string password_digest:string
-rails g model Micropost content:string title:string youtube_id:string user:references
-rails g model Relationship follower_id:integer followed_id:integer
+rails g model User name:string email:string password_digest:string  --skip-migration
+rails g model Micropost content:string title:string youtube_id:string user:references  --skip-migration
+rails g model Relationship follower_id:integer followed_id:integer  --skip-migration
+rails g model Notification --skip-migration
 ```
