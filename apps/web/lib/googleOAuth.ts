@@ -14,7 +14,7 @@ export function buildGoogleOAuthUrl(): string | null {
     prompt: "consent",
     scope: SCOPE,
   })
-  return `https://accounts.google.com/o/oauth2/auth?${params.toString()}`
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
 }
 
 export function redirectToGoogleOAuth(): void {

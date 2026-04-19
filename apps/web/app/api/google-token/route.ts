@@ -18,8 +18,7 @@ export async function POST(request: Request) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID ?? process.env.NEXT_PUBLIC_CLIENT_ID
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET ?? process.env.CLIENT_SECRET
-  const redirectUri =
-    process.env.GOOGLE_OAUTH_REDIRECT_URI ?? process.env.NEXT_PUBLIC_REDIRECT_URI
+  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI
 
   if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.json(

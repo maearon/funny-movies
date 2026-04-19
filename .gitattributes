@@ -7,3 +7,22 @@ apps/service/db/schema.rb linguist-generated
 apps/service/vendor/* linguist-vendored
 apps/service/config/credentials/*.yml.enc diff=rails_credentials
 apps/service/config/credentials.yml.enc diff=rails_credentials
+
+# Automatically handle line endings for all text files.
+* text=auto eol=lf
+
+# Ruby
+*.rb text eol=lf
+*.rake text eol=lf
+*.gemspec text eol=lf
+
+# Node.js / Frontend
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.svelte text eol=lf

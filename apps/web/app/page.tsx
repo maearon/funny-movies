@@ -17,11 +17,11 @@ import flashMessage from "../components/shared/flashMessages";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/session/sessionSlice";
 import { embedUrlFromVideoId, extractYoutubeVideoId } from "@/lib/youtube";
-import { fetchYoutubeVideoDetails } from "@/lib/youtubeApi";
+import { fetchYoutubeVideoDetails, YoutubeSnippetDetails } from "@/lib/youtubeApi";
 import { redirectToGoogleOAuth } from "@/lib/googleOAuth";
 
 const Home: NextPage = () => {
-  const [demoVideo, setDemoVideo] = useState<any>(null);
+  const [demoVideo, setDemoVideo] = useState<YoutubeSnippetDetails | null>(null);
   const [page, setPage] = useState(1);
   const [feedItems, setFeedItems] = useState<Micropost[]>([]);
   const [total_count, setTotalCount] = useState(1);
@@ -79,7 +79,7 @@ const Home: NextPage = () => {
         setFeedItems([]);
       }
     } catch {
-      flashMessage("error", "Could not load feed");
+      // flashMessage("error", "Could not load feed");
     }
   }, [page]);
 
@@ -113,7 +113,9 @@ const Home: NextPage = () => {
   }, [setFeeds]);
 
   useEffect(() => {
-    void setFeeds();
+    void (async () => {
+      await setFeeds();
+    })();
   }, [page, setFeeds]);
 
   const handleAuthClick = () => {

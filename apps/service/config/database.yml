@@ -92,5 +92,39 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  url: <%= ENV['POSTGRES_URL'] %>
+  primary:
+    <<: *default
+    # database: <%= ENV['POSTGRES_DATABASE'] %>
+    # username: <%= ENV['POSTGRES_USER'] %>
+    # password: <%= ENV['POSTGRES_PASSWORD'] %>
+    # host: <%= ENV['POSTGRES_HOST'] %>
+    # port: 5432  
+    url: <%= ENV['POSTGRES_URL'] %>
+
+  cable:
+    <<: *default
+    # database: <%= ENV['POSTGRES_DATABASE'] %>     
+    # username: <%= ENV['POSTGRES_USER'] %>
+    # password: <%= ENV['POSTGRES_PASSWORD'] %>   
+    # host: <%= ENV['POSTGRES_HOST'] %>
+    # port: 5432
+    url: <%= ENV['POSTGRES_URL'] %>
+
+  queue:
+    <<: *default
+    # database: <%= ENV['POSTGRES_DATABASE'] %>     
+    # username: <%= ENV['POSTGRES_USER'] %>
+    # password: <%= ENV['POSTGRES_PASSWORD'] %>   
+    # host: <%= ENV['POSTGRES_HOST'] %>
+    # port: 5432  
+    url: <%= ENV['POSTGRES_URL'] %>
+
+  cache:
+    <<: *default
+    # database: <%= ENV['POSTGRES_DATABASE'] %>     
+    # username: <%= ENV['POSTGRES_USER'] %>
+    # password: <%= ENV['POSTGRES_PASSWORD'] %>   
+    # host: <%= ENV['POSTGRES_HOST'] %>
+    # port: 5432  
+    url: <%= ENV['POSTGRES_URL'] %>
+

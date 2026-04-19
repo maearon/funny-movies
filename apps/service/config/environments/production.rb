@@ -44,11 +44,11 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  config.cache_store = :solid_cache_store
+  config.cache_store = :memory_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
+  config.active_job.queue_adapter = :async
+  # config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -68,7 +68,7 @@ Rails.application.configure do
   }
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "ruby-rails-boilerplate-3s9t.onrender.com", protocol: 'https' }
+  config.action_mailer.default_url_options = { host: "funny-movies-b3dt.onrender.com", protocol: 'https' }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {
@@ -93,6 +93,7 @@ Rails.application.configure do
   config.action_cable.disable_request_forgery_protection = true
   config.action_cable.allowed_request_origins = [
     "https://funny-movies-pied.vercel.app",
+    "https://funny-movies-b3dt.onrender.com",
     /https:\/\/.+\.vercel\.app/
   ]
 
@@ -101,6 +102,7 @@ Rails.application.configure do
   #   "example.com",     # Allow requests from example.com
   #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
   # ]
+  config.hosts << /.*\.onrender\.com/
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }

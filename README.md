@@ -24,7 +24,7 @@ This project is a full-stack web application for sharing YouTube videos with  al
 **Deployed (example)**
 
 - Frontend: Vercel — `https://funny-movies-pied.vercel.app`
-- Backend: Render — `https://ruby-rails-boilerplate-3s9t.onrender.com`
+- Backend: Render — `https://funny-movies-b3dt.onrender.com`
 
 Configure the frontend with `NEXT_PUBLIC_BACKEND_ORIGIN` pointing at your Rails host so REST and WebSockets use the same origin.
 
@@ -48,8 +48,8 @@ Configure the frontend with `NEXT_PUBLIC_BACKEND_ORIGIN` pointing at your Rails 
 ### Clone
 
 ```bash
-git clone git@github.com:maearon/remitano-test.git
-cd remitano-test
+git clone git@github.com:maearon/funny-movies.git
+cd funny-movies
 ```
 
 ### Backend (`apps/service`)
@@ -61,9 +61,10 @@ bundle install
 
 Copy environment template (create `.env` or use hosting env vars). Required concepts:
 
-- `POSTGRES_*` or `POSTGRES_URL` / `DATABASE_URL` — database connection.
+- `POSTGRES_*` (`POSTGRES_DATABASE`, `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`) or `POSTGRES_URL` / `DATABASE_URL` — database connection.
 - `RAILS_MASTER_KEY` or credentials for `secret_key_base` (JWT signing).
-- Optional: SMTP vars for mailers.
+- `FRONTEND_URL` for use in mail templates.
+- Optional: `SMTP_*` (`SMTP_USERNAME`, `SMTP_PASSWORD`) vars for mailers.
 
 ### Frontend (`apps/web`)
 
@@ -98,7 +99,15 @@ The canonical schema for local use should live in `apps/service/db/schema.rb` af
 3. When possible, run:
 
 ```bash
+git config --global core.autocrlf input
+sudo apt update
+sudo apt install dos2unix
+find . -type f -exec dos2unix {} +
+git add --renormalize .
+git commit -m "Normalize line endings to LF"
 cd apps/service
+rails db:schema:dump
+bin/rails db:setup
 bin/rails db:prepare
 ```
 
@@ -107,6 +116,12 @@ If you only use a remote DB that already has tables, point Rails at that URL and
 ---
 
 ## Running the application
+
+**Docker**
+
+```bash
+docker compose up --build
+```
 
 **Ports (default in this repo)**
 
