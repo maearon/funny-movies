@@ -6,6 +6,8 @@ json.feed_items do
     json.gravatar_id Digest::MD5::hexdigest(i.user.email.downcase)
     json.size 50
     json.content i.content
+    json.title i.title
+    json.youtube_id i.youtube_id
     json.timestamp time_ago_in_words(i.created_at)
   end
 end
