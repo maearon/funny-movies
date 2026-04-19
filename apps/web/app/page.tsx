@@ -39,13 +39,34 @@ const Home: NextPage = () => {
       const response: ListResponse<Micropost> = await micropostApi.getAll({
         page,
       });
+
       if (response.feed_items) {
-        setFeedItems(response.feed_items);
+        const enriched = await Promise.all(
+          response.feed_items.map(async (item) => {
+            const videoId = item.youtube_id ?? item.videoId;
+
+            if (!videoId) return item;
+
+            const details = await fetchYoutubeVideoDetails(videoId);
+
+            if (!details) return item;
+
+            return {
+              ...item,
+              channelTitle: details.channelTitle,
+              description: details.description,
+              title: details.title || item.title,
+            };
+          })
+        );
+
+        setFeedItems(enriched);
         setTotalCount(response.total_count);
         setFollowing(response.following);
         setFollowers(response.followers);
         setMicropost(response.micropost);
         setGavatar(response.gravatar);
+
         if (response.feed_items.length === 0 && page > 1) {
           setPage((prev) => prev - 1);
         }
