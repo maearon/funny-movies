@@ -19,13 +19,14 @@ export interface ListResponse<Micropost> {
 export interface Micropost {
   readonly id: number
   content: string
+  title?: string
+  youtube_id?: string
   gravatar_id?: string
   image: string
   size: number
   timestamp: string
   readonly user_id: string
   user_name?: string
-  title?: string
   description?: string
   videoId?: string
   channelTitle?: string
@@ -44,11 +45,17 @@ export interface Micropost {
 
 export interface CreateResponse {
   flash?: [message_type: string, message: string]
-  error?: ErrorMessageType
+  error?: ErrorMessageType | string[]
 }
 
 export interface Response {
   flash?: [message_type: string, message: string]
+}
+
+export interface CreateMicropostParams {
+  content: string
+  title: string
+  youtube_id: string
 }
 
 const micropostApi = {
@@ -57,20 +64,20 @@ const micropostApi = {
     return API.get(url, { params });
   },
 
-  // create(params: CreateParams): Promise<CreateResponse> {
-  //   const url = '/microposts';
-  //   return API.post(url,params, headers: { Content-Type:'multipart/form-data' } })
-  // },
+  create(params: CreateMicropostParams): Promise<CreateResponse> {
+    const url = "/microposts"
+    const fd = new FormData()
+    fd.append("micropost[content]", params.content)
+    fd.append("micropost[title]", params.title)
+    fd.append("micropost[youtube_id]", params.youtube_id)
+    return API.post(url, fd)
+  },
 
   remove(id: number): Promise<Response> {
     const url = `/microposts/${id}`;
     return API.delete(url);
   },
 
-  likeOrDislikeYoutubeVideo(videoId: string, rating: string): Promise<Response> {
-    const url = `https://www.googleapis.com/youtube/v3/videos/rate?id=${videoId}&rating=${rating}`;
-    return API.post(url);
-  },
 };
 
 export default micropostApi;
