@@ -57,6 +57,8 @@ const ShowFollow = (props: {params: Promise<{slug: string[]}>}) => {
     }
   }
 
+  if (!user) return <div>Loading...</div>;
+
   return (
     <>
     <div className="row">
@@ -64,15 +66,15 @@ const ShowFollow = (props: {params: Promise<{slug: string[]}>}) => {
         <section className="user_info">
           <Image
             className={"gravatar"}
-            src={"https://secure.gravatar.com/avatar/"+user.gravatar+"?s=80"}
-            alt={user.name}
+            src={`https://secure.gravatar.com/avatar/${user?.gravatar || ""}?s=80`}
+            alt={user?.name || "User avatar"}
             width={80}
             height={80}
             priority
           />
-          <h1>{user.name}</h1>
-          <span><Link href={"/users/"+user.id}>view my profile</Link></span>
-          <span><b>Microposts:</b> {user.micropost}</span>
+          <h1>{user?.name || "User Name"}</h1>
+          <span><Link href={"/users/"+user?.id}>view my profile</Link></span>
+          <span><b>Microposts:</b> {user?.micropost}</span>
         </section>
 
         <section className="stats">
