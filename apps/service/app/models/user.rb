@@ -4,7 +4,7 @@ class User < ApplicationRecord
   # == Associations
   has_many :microposts, dependent: :destroy
 
-  # accessor for tokens
+  # accessors
   attr_accessor :token, :token_expiration_at, :remember_token, :activation_token, :reset_token
 
   # Follow system

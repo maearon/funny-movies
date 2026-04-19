@@ -3,8 +3,8 @@ class Micropost < ApplicationRecord
 
   # validations
   validates :content, presence: true
-  # validates :title, presence: true
-  # validates :youtube_id, presence: true
+  validates :title, presence: true
+  validates :youtube_id, presence: true
 
   # order newest first
   default_scope -> { order(created_at: :desc) }

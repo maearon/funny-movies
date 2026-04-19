@@ -10,3 +10,7 @@ class CreateMicroposts < ActiveRecord::Migration[8.1]
   #   end
   # end
 end
+
+# ALTER TABLE microposts
+# ADD COLUMN title TEXT,
+# ADD COLUMN youtube_id TEXT;
