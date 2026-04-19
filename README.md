@@ -61,9 +61,10 @@ bundle install
 
 Copy environment template (create `.env` or use hosting env vars). Required concepts:
 
-- `POSTGRES_*` or `POSTGRES_URL` / `DATABASE_URL` — database connection.
+- `POSTGRES_*` (`POSTGRES_DATABASE`, `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`) or `POSTGRES_URL` / `DATABASE_URL` — database connection.
 - `RAILS_MASTER_KEY` or credentials for `secret_key_base` (JWT signing).
-- Optional: SMTP vars for mailers.
+- `FRONTEND_URL` for use in mail templates.
+- Optional: `SMTP_*` (`SMTP_USERNAME`, `SMTP_PASSWORD`) vars for mailers.
 
 ### Frontend (`apps/web`)
 
@@ -107,6 +108,12 @@ If you only use a remote DB that already has tables, point Rails at that URL and
 ---
 
 ## Running the application
+
+**Docker**
+
+```bash
+docker compose up --build
+```
 
 **Ports (default in this repo)**
 
