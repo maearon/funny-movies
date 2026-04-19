@@ -1,7 +1,13 @@
 require "test_helper"
 
 class NotifyUsersJobTest < ActiveJob::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  include ActionCable::TestHelper
+
+  test "broadcasts when micropost exists" do
+    micropost = microposts(:one)
+
+    assert_broadcasts("video_notifications", 1) do
+      NotifyUsersJob.perform_now(micropost.id)
+    end
+  end
 end
