@@ -1,255 +1,215 @@
 "use client";
-import { NextPage } from 'next'
+
+import type { NextPage } from "next";
 import Image from "next/image";
 import styles from "./page.module.css";
-import Link from 'next/link'
-import React, {  useCallback, useEffect, useRef, useState } from 'react'
-import Pagination from 'react-js-pagination'
-import Skeleton from 'react-loading-skeleton'
-import micropostApi, { CreateResponse, ListResponse, Micropost } from '../components/shared/api/micropostApi'
-import ShowErrors, { ErrorMessageType } from '@/components/shared/errorMessages'
-import flashMessage from '../components/shared/flashMessages'
-import { useAppSelector } from '@/redux/hooks';
-import { selectUser } from '@/redux/session/sessionSlice';
-
-const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
-const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
-const SCOPE = process.env.NEXT_PUBLIC_SCOPE;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+import Link from "next/link";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import Pagination from "react-js-pagination";
+import Skeleton from "react-loading-skeleton";
+import micropostApi, {
+  CreateResponse,
+  ListResponse,
+  Micropost,
+} from "../components/shared/api/micropostApi";
+import ShowErrors, { ErrorMessageType } from "@/components/shared/errorMessages";
+import flashMessage from "../components/shared/flashMessages";
+import { useAppSelector } from "@/redux/hooks";
+import { selectUser } from "@/redux/session/sessionSlice";
+import { embedUrlFromVideoId, extractYoutubeVideoId } from "@/lib/youtube";
+import { fetchYoutubeVideoDetails } from "@/lib/youtubeApi";
+import { redirectToGoogleOAuth } from "@/lib/googleOAuth";
 
 const Home: NextPage = () => {
-  const [page, setPage] = useState(1)
-  const [feedItems, setFeedItems] = useState<any[]>([])
-  const [total_count, setTotalCount] = useState(1)
-  const [following, setFollowing] = useState<number>(0)
-  const [followers, setFollowers] = useState<number>(0)
-  const [micropost, setMicropost] = useState<number>(0)
-  const [gravatar, setGavatar] = useState<string>('')
-  const [content, setContent] = useState('')
-  const [image, setImage] = useState(null)
-  const [imageName, setImageName] = useState('')
-  const inputEl = useRef<HTMLInputElement>(null)
+  const [page, setPage] = useState(1);
+  const [feedItems, setFeedItems] = useState<Micropost[]>([]);
+  const [total_count, setTotalCount] = useState(1);
+  const [following, setFollowing] = useState<number>(0);
+  const [followers, setFollowers] = useState<number>(0);
+  const [micropost, setMicropost] = useState<number>(0);
+  const [gravatar, setGavatar] = useState<string>("");
+  const [content, setContent] = useState("");
+  const inputEl = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<ErrorMessageType>({});
-  const { value: current_user, status } = useAppSelector(selectUser)
-  const loading = status === "loading"
-  const [authCode, setAuthCode] = useState<string | null>(null);
+  const { value: current_user, status } = useAppSelector(selectUser);
+  const loading = status === "loading";
 
-  const extractVideoId = (youtubeUrl: string): string | null => {
-    const regExp = /embed\/([^?]*)/;
-    const match = youtubeUrl.match(regExp);
-    return (match && match[1]) ? match[1] : null;
-  };
-
-  const fetchVideoDetails = async (videoId: string) => {
-    // https://www.geeksforgeeks.org/how-to-get-youtube-video-data-by-using-youtube-data-api-and-php/
-    // https://console.cloud.google.com/apis/credentials?orgonly=true&project=apt-helix-426002-r5&supportedpurview=project,organizationId,folder
-    const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${API_KEY}&part=snippet`;
-
+  const setFeeds = useCallback(async () => {
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      const videoData = data.items[0].snippet;
-      return {
-        title: videoData.title,
-        description: videoData.description.length > 240 ? videoData.description.substring(0, 240) + '...' : videoData.description,
-        videoId: videoId,
-        channelTitle: videoData.channelTitle,
-      };
-    } catch (error) {
-      flashMessage('error', 'Failed to fetch video details')
-      return {
-        title: 'Number of requests you can make to the API within a given period has been surpassed' ,
-        description: 'Number of requests you can make to the API within a given period has been surpassed',
-        videoId: videoId,
-        channelTitle: 'Number of requests you can make to the API within a given period has been surpassed',
-      };
-    }
-  };
-
-  const setFeeds = useCallback(async () => { 
-    micropostApi.getAll({page: page}
-    ).then(async (response: ListResponse<Micropost>) => {
+      const response: ListResponse<Micropost> = await micropostApi.getAll({
+        page,
+      });
       if (response.feed_items) {
-        const updatedFeedItems = await Promise.all(
-          response.feed_items.map(async (item) => {
-            const videoId = extractVideoId(item.content);
-            if (videoId) {
-              const details = await fetchVideoDetails(videoId);
-              if (details) {
-                return { ...item, ...details };
-              }
-            }
-            return item;
-          })
-        );
-        setFeedItems(updatedFeedItems)
-        setTotalCount(response.total_count)
-        setFollowing(response.following)
-        setFollowers(response.followers)
-        setMicropost(response.micropost)
-        setGavatar(response.gravatar)
+        setFeedItems(response.feed_items);
+        setTotalCount(response.total_count);
+        setFollowing(response.following);
+        setFollowers(response.followers);
+        setMicropost(response.micropost);
+        setGavatar(response.gravatar);
         if (response.feed_items.length === 0 && page > 1) {
-          setPage(prev => prev - 1);
+          setPage((prev) => prev - 1);
         }
       } else {
-        setFeedItems([])
+        setFeedItems([]);
       }
-    })
-    .catch((error: any) => {
-      flashMessage('error', 'Set feed unsuccessfully')
-    })
-  }, [page])
-
-  const handleAuthClick = () => {
-    const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}`;
-    window.location.href = authUrl;
-  };
-
-  useEffect(() => {
-    setFeeds()
-  }, [page, setFeeds])
+    } catch {
+      flashMessage("error", "Could not load feed");
+    }
+  }, [page]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+    const code = urlParams.get("code");
+    if (!code) return;
 
-    if (code !== null) {
-      const params = new URLSearchParams();
-      params.append('code', code);
-      params.append('client_id', CLIENT_ID || '');
-      params.append('client_secret', CLIENT_SECRET || '');
-      params.append('redirect_uri', REDIRECT_URI || '');
-      params.append('grant_type', 'authorization_code');
-
-      fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-      })
-      .then(response => response.json())
-      .then(data => {
-        localStorage.setItem('accessToken', data.access_token);
-        setFeeds();
-        window.history.pushState({}, document.title, "/");
-      })
-      .catch(error => {
-        flashMessage('error', 'Error exchanging code for token')
-      });
-    } else {
-      flashMessage('error', 'Authorization code is missing from URL')
-    }
+    void (async () => {
+      try {
+        const res = await fetch("/api/google-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          flashMessage("error", data.error ?? "Google token exchange failed");
+          return;
+        }
+        if (data.access_token) {
+          localStorage.setItem("youtube_oauth_token", data.access_token);
+          flashMessage("success", "Connected to YouTube for ratings");
+        }
+        window.history.replaceState({}, document.title, "/");
+        void setFeeds();
+      } catch {
+        flashMessage("error", "Error exchanging Google authorization code");
+      }
+    })();
   }, [setFeeds]);
 
-  const handleRate = async (videoId: any, rating: any) => {
-    const accessToken = localStorage.getItem('accessToken');
-  
+  useEffect(() => {
+    void setFeeds();
+  }, [page, setFeeds]);
+
+  const handleAuthClick = () => {
+    redirectToGoogleOAuth();
+    if (!process.env.NEXT_PUBLIC_CLIENT_ID) {
+      flashMessage("warning", "Google OAuth is not configured (NEXT_PUBLIC_CLIENT_ID)");
+    }
+  };
+
+  const getYoutubeRatingToken = () => localStorage.getItem("youtube_oauth_token");
+
+  const handleRate = async (videoId: string, rating: "like" | "dislike") => {
+    const accessToken = getYoutubeRatingToken();
+
     if (!accessToken) {
-      flashMessage('warning', 'Access token is missing. Please authenticate.')
+      flashMessage("warning", "Sign in with Google to rate videos.");
       handleAuthClick();
       return;
     }
-  
+
     try {
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos/rate?id=${videoId}&rating=${rating}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos/rate?id=${encodeURIComponent(videoId)}&rating=${rating}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
-  
+      );
+
       if (response.status === 204) {
-        flashMessage('success', `Video ${rating} successfully`)
+        flashMessage("success", `Video ${rating} saved`);
+        return;
       }
 
       if (response.status === 401) {
-        flashMessage('error', `Video ${rating} unsuccessfully`)
-        localStorage.removeItem("accessToken");
-        handleRate(videoId, rating)
+        localStorage.removeItem("youtube_oauth_token");
+        flashMessage("warning", "YouTube session expired — please connect again.");
+        handleAuthClick();
+      } else {
+        flashMessage("error", `Could not ${rating} this video`);
       }
-    } catch (error) {
-      flashMessage('error', `Video ${rating} unsuccessfully`)
-      localStorage.removeItem("accessToken");
-      handleRate(videoId, rating)
+    } catch {
+      flashMessage("error", `Could not ${rating} this video`);
     }
   };
 
   const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
-    setPage(pageNumber)
-  }
+    setPage(pageNumber);
+  };
 
-  const handleContentInput = (e: any) => {
-    setContent(e.target.value)
-  }
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault()
-    const formData2 = new FormData()
-    formData2.append('micropost[content]', content)
-    if (image) {
-      formData2.append('micropost[image]', image || new Blob, imageName)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = content.trim();
+    const videoId = extractYoutubeVideoId(trimmed);
+    if (!videoId) {
+      flashMessage(
+        "warning",
+        "Paste a valid YouTube link (watch, embed, shorts, or youtu.be).",
+      );
+      return;
     }
 
-    var BASE_URL = ''
-    if (process.env.NODE_ENV === 'development') {
-      BASE_URL = 'http://localhost:3000/api'
-    } else if (process.env.NODE_ENV === 'production') {
-      BASE_URL = 'https://ruby-rails-boilerplate-3s9t.onrender.com/api'
-    }
+    const details = await fetchYoutubeVideoDetails(videoId);
+    if (!details) return;
 
-    fetch(BASE_URL+`/microposts`, {
-      method: "POST",
-      body: formData2,
-      credentials: 'include',
-      headers: {
-        'Authorization': localStorage.getItem('token') && localStorage.getItem('token') !== 'undefined' ?
-        `Bearer ${localStorage.getItem('token')} ${localStorage.getItem('remember_token')}` :
-        `Bearer ${sessionStorage.getItem('token')} ${sessionStorage.getItem('remember_token')}`
-      }
-    })
-    .then((response: any) => response.json().then((data: CreateResponse) => {
+    try {
+      const data: CreateResponse = await micropostApi.create({
+        content: trimmed,
+        title: details.title,
+        youtube_id: videoId,
+      });
+
       if (data.flash) {
-        setFeeds()
-        inputEl.current!.blur()
-        flashMessage(...data.flash)
-        setContent('')
-        setImage(null)
-        setErrors({})
+        await setFeeds();
+        inputEl.current?.blur();
+        flashMessage(...data.flash);
+        setContent("");
+        setErrors({});
       }
       if (data.error) {
-        inputEl.current!.blur()
-        setErrors(data.error)
+        inputEl.current?.blur();
+        setErrors(
+          Array.isArray(data.error) ? { base: data.error } : data.error,
+        );
       }
-    })
-    )
-  }
+    } catch {
+      flashMessage("error", "Could not share video");
+    }
+  };
 
   const removeMicropost = (micropostid: number) => {
-    let sure = window.confirm("You sure?")
-    if (sure === true) {
-      micropostApi.remove(micropostid
-      ).then(response => {
+    const sure = window.confirm("You sure?");
+    if (sure !== true) return;
+
+    micropostApi
+      .remove(micropostid)
+      .then((response) => {
         if (response.flash) {
-          flashMessage(...response.flash)
-          setFeeds()
+          flashMessage(...response.flash);
+          void setFeeds();
         }
       })
-      .catch((error: any) => {
-        flashMessage('error', 'Create micropost unsuccessfully')
-      })
-    }
-  }
+      .catch(() => {
+        flashMessage("error", "Could not delete micropost");
+      });
+  };
+
+  const videoEmbedSrc = (item: Micropost) => {
+    const id = item.youtube_id ?? item.videoId;
+    return id ? embedUrlFromVideoId(id) : "";
+  };
+
+  const ratingVideoId = (item: Micropost) =>
+    item.youtube_id ?? item.videoId ?? "";
 
   return loading ? (
     <>
-    <Skeleton height={304} />
-    <Skeleton circle={true} height={60} width={60} />
+      <Skeleton height={304} />
+      <Skeleton circle={true} height={60} width={60} />
     </>
   ) : current_user?.email ? (
     <div className="row">
@@ -257,153 +217,251 @@ const Home: NextPage = () => {
         <section className="user_info">
           <Image
             className={"gravatar"}
-            src={"https://secure.gravatar.com/avatar/"+gravatar+"?s=50"}
-            alt={current_user.name} 
+            src={`https://secure.gravatar.com/avatar/${gravatar || ""}?s=50`}
+            alt={current_user?.name || "User avatar"}
             width={50}
             height={50}
             priority
           />
           <h1>{current_user.name}</h1>
-          <span><Link href={"/users/"+current_user.id}>view my profile</Link></span>
-          <span>{micropost} post{micropost !== 1 ? 's' : ''}</span>
+          <span>
+            <Link href={"/users/" + current_user.id}>view my profile</Link>
+          </span>
+          <span>
+            {micropost} post{micropost !== 1 ? "s" : ""}
+          </span>
         </section>
 
         <section className="stats">
           <div className="stats">
-            <Link href={"/users/"+current_user.id+"/following"}>
+            <Link href={"/users/" + current_user.id + "/following"}>
               <strong id="following" className="stat">
                 {following}
-              </strong> following
+              </strong>{" "}
+              following
             </Link>
-            <Link href={"/users/"+current_user.id+"/followers"}>
+            <Link href={"/users/" + current_user.id + "/followers"}>
               <strong id="followers" className="stat">
                 {followers}
-              </strong> followers
+              </strong>{" "}
+              followers
             </Link>
           </div>
         </section>
 
         <section className="micropost_form">
           <form
-          encType="multipart/form-data"
-          action="/microposts"
-          acceptCharset="UTF-8"
-          method="post"
-          onSubmit={handleSubmit}
+            encType="multipart/form-data"
+            action="/microposts"
+            acceptCharset="UTF-8"
+            method="post"
+            onSubmit={(e) => void handleSubmit(e)}
           >
-            {Object.keys(errors).length !== 0 &&
+            {Object.keys(errors).length !== 0 && (
               <ShowErrors errorMessage={errors} />
-            }
+            )}
             <div className="field">
-                <label htmlFor="micropost[content]">Youtube URL:</label>
-                <textarea
-                placeholder="Compose new url https://www.youtube.com/embed/abPmZCZZrFA?si=CJdRW8sNd5laZsfJ..."
+              <label htmlFor="micropost_content">YouTube URL</label>
+              <textarea
+                placeholder="https://www.youtube.com/watch?v=… or https://youtu.be/…"
                 name="micropost[content]"
                 id="micropost_content"
                 value={content}
-                onChange={handleContentInput}
-                >
-                </textarea>
+                onChange={(e) => setContent(e.target.value)}
+                rows={3}
+              />
             </div>
-            <input ref={inputEl} type="submit" name="commit" value="Share" className="btn btn-primary" data-disable-with="Post" />
+            <input
+              ref={inputEl}
+              type="submit"
+              name="commit"
+              value="Share"
+              className="btn btn-primary"
+              data-disable-with="Post"
+            />
           </form>
         </section>
       </aside>
 
       <div className="col-md-8">
-        {feedItems.length > 0 &&
-        <>
-        <ol className="microposts">
-          { feedItems.map((i:any, t) => (
-              <li key={t} id= {'micropost-'+i.id} >
-                <Link href={'/users/'+i.user_id}>
-                  <Image
-                    className={"gravatar"}
-                    src={"https://secure.gravatar.com/avatar/"+i.gravatar_id+"?s="+i.size}
-                    alt={i.user_name}
-                    width={i.size}
-                    height={i.size}
-                    priority
-                  />
-                </Link>
-                <span className="user"><Link href={'/users/'+i.user_id}>{i.user_name}</Link></span>
-                
-                <span className="content">
-                  <b>{i.title}</b>
-                  <Link target="_blank" href={"https://www.youtube.com/results?search_query="+i.channelTitle}> ({i.channelTitle})</Link>
-                  <div className="videoWrapper">
-                    <iframe
-                      src={"https://www.youtube.com/embed/"+i.videoId} allow="autoplay; encrypted-media" allowFullScreen>
-                    </iframe>
-                  </div>
-                  <p>{i.description}</p>
-                  { i.image &&
+        {feedItems.length > 0 && (
+          <>
+            <ol className="microposts">
+              {feedItems.map((i) => (
+                <li key={i.id} id={"micropost-" + i.id}>
+                  <Link href={"/users/" + i.user_id}>
                     <Image
-                      src={''+i.image+''}
-                      alt="Example User"
-                      width={50}
-                      height={50}
+                      className={"gravatar"}
+                      src={
+                        "https://secure.gravatar.com/avatar/" +
+                        i.gravatar_id +
+                        "?s=" +
+                        i.size
+                      }
+                      alt={i.user_name ?? ""}
+                      width={i.size}
+                      height={i.size}
                       priority
                     />
-                  }
-                  <div className="btn btn-primary" onClick={() => handleRate(i.videoId, "like")}>
-                    Like
-                  </div>
-                  <div className="btn btn-primary" onClick={() => handleRate(i.videoId, "dislike")}>
-                    Dislike
-                  </div>
-                </span>
-                <span className="timestamp">
-                {'Shared '+i.timestamp+' ago. '}
-                {current_user?.id === i.user_id &&
-                  <Link href={'#/microposts/'+i.id} onClick={() => removeMicropost(i.id)}>delete</Link>
-                }
-                </span>
-              </li>
-          ))}
-        </ol>
+                  </Link>
+                  <span className="user">
+                    <Link href={"/users/" + i.user_id}>{i.user_name}</Link>
+                  </span>
 
-        <Pagination
-          activePage={page}
-          itemsCountPerPage={5}
-          totalItemsCount={total_count}
-          pageRangeDisplayed={5}
-          onChange={handlePageChange}
-        />
-        </>
-        }
+                  <span className="content">
+                    <b>{i.title ?? "Untitled"}</b>
+                    {i.channelTitle && (
+                      <Link
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={
+                          "https://www.youtube.com/results?search_query=" +
+                          encodeURIComponent(i.channelTitle)
+                        }
+                      >
+                        {" "}
+                        ({i.channelTitle})
+                      </Link>
+                    )}
+                    {videoEmbedSrc(i) ? (
+                      <div className="videoWrapper">
+                        <iframe
+                          title={i.title ?? "YouTube video"}
+                          src={videoEmbedSrc(i)}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        />
+                      </div>
+                    ) : null}
+                    {i.description ? <p>{i.description}</p> : null}
+                    <p>
+                      <small>
+                        Original link:{" "}
+                        <a
+                          href={i.content}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {i.content}
+                        </a>
+                      </small>
+                    </p>
+                    <div className="btn-group" style={{ marginTop: 8 }}>
+                      <button
+                        type="button"
+                        className="btn btn-default btn-sm"
+                        onClick={() =>
+                          void handleRate(ratingVideoId(i), "like")
+                        }
+                      >
+                        <i className="fa fa-thumbs-o-up" aria-hidden="true" />{" "}
+                        Like
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-default btn-sm"
+                        onClick={() =>
+                          void handleRate(ratingVideoId(i), "dislike")
+                        }
+                      >
+                        <i
+                          className="fa fa-thumbs-o-down"
+                          aria-hidden="true"
+                        />{" "}
+                        Dislike
+                      </button>
+                    </div>
+                  </span>
+                  <span className="timestamp">
+                    {"Shared " + i.timestamp + " ago. "}
+                    {current_user?.id === i.user_id && (
+                      <Link
+                        href={"#/microposts/" + i.id}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          removeMicropost(i.id);
+                        }}
+                      >
+                        delete
+                      </Link>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ol>
+
+            <Pagination
+              activePage={page}
+              itemsCountPerPage={5}
+              totalItemsCount={total_count}
+              pageRangeDisplayed={5}
+              onChange={handlePageChange}
+            />
+          </>
+        )}
       </div>
-  </div>
+    </div>
   ) : (
     <>
-    <div className="center jumbotron">
+      <div className="center jumbotron">
         <h1>Welcome to the Funny Movies App</h1>
         <h2>
-        This is the home page for the <Link href="https://funny-movies-pied.vercel.app">funny movies application</Link>.
+          This is the home page for the{" "}
+          <Link href="https://funny-movies-pied.vercel.app">
+            funny movies application
+          </Link>
+          .
         </h2>
         <span className="content">
-        <b>SƠN TÙNG M-TP | SKY DECADE | Nắng Ấm Ngang Qua</b>
-        <Link target="_blank" href="https://www.youtube.com/results?search_query=Sơn Tùng M-TP Official"> (Sơn Tùng M-TP Official)</Link>
+          <b>SƠN TÙNG M-TP | SKY DECADE | Nắng Ấm Ngang Qua</b>
+          <Link
+            target="_blank"
+            href="https://www.youtube.com/results?search_query=Sơn Tùng M-TP Official"
+          >
+            {" "}
+            (Sơn Tùng M-TP Official)
+          </Link>
           <div className="videoWrapper">
-            <iframe src="https://www.youtube.com/embed/Zuk5zGv5Un4?autoplay=1" allow="autoplay; encrypted-media" allowFullScreen></iframe>
+            <iframe
+              title="Featured video"
+              src="https://www.youtube.com/embed/Zuk5zGv5Un4"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
           </div>
-          <div className="btn btn-primary" onClick={() => handleRate("Zuk5zGv5Un4", "like")}>Like</div>
-          <div className="btn btn-primary" onClick={() => handleRate("Zuk5zGv5Un4", "dislike")}>Dislike</div>
+          <div className="btn-group" style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              className="btn btn-default btn-sm"
+              onClick={() => void handleRate("Zuk5zGv5Un4", "like")}
+            >
+              <i className="fa fa-thumbs-o-up" aria-hidden="true" /> Like
+            </button>
+            <button
+              type="button"
+              className="btn btn-default btn-sm"
+              onClick={() => void handleRate("Zuk5zGv5Un4", "dislike")}
+            >
+              <i className="fa fa-thumbs-o-down" aria-hidden="true" /> Dislike
+            </button>
+          </div>
         </span>
-        <Link href="/signup" className="btn btn-lg btn-primary">Sign up now!</Link>
-    </div>
-    <Link href="https://nextjs.org/" target="_blank">
-      <Image
-        className={styles.logo}
-        src="/next.svg"
-        alt="Next.js logo"
-        width={180}
-        height={38}
-        priority
-      />
-    </Link>
+        <Link href="/signup" className="btn btn-lg btn-primary">
+          Sign up now!
+        </Link>
+      </div>
+      <Link href="https://nextjs.org/" target="_blank">
+        <Image
+          className={styles.logo}
+          src="/next.svg"
+          alt="Next.js logo"
+          width={180}
+          height={38}
+          priority
+        />
+      </Link>
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
