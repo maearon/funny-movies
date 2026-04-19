@@ -118,7 +118,7 @@ jobs:
 
     steps:
       - name: Deploy Rails service to Render
-        uses: johnbeynon/render-deploy-action@v0.0.8
+        uses: johnbeynon/render-deploy-action@v0.0.9
         with:
           service-id: ${{ secrets.RENDER_SERVICE_ID_RAILS }}
           api-key: ${{ secrets.RENDER_API_KEY }}
