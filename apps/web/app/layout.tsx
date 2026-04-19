@@ -1,6 +1,7 @@
 'use client'
 
 import "../styles/globals.css";
+import "./navbar-overrides.css";
 import localFont from "next/font/local";
 import ReactQueryProvider from './ReactQueryProvider';
 import { ToastContainer } from "react-toastify";
@@ -8,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Script from "next/script";
 import Header from "./layouts/header";
 import Footer from "./layouts/footer";
+import VideoNotificationsSubscriber from "@/components/notifications/VideoNotificationsSubscriber";
 // import { Providers } from "@/components/providers";
 import { store } from "@/redux/store";
 import { fetchUser } from "@/redux/session/sessionSlice";
@@ -49,6 +51,7 @@ export default function RootLayout({
               </Head>
 
               <Header />
+              <VideoNotificationsSubscriber />
 
               <div className="container">
                 {children}
