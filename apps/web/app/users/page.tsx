@@ -7,8 +7,6 @@ import { useAppSelector } from '@/redux/hooks';
 import { selectUser } from '@/redux/session/sessionSlice';
 import userApi, { User } from '../../components/shared/api/userApi'
 import flashMessage from '../../components/shared/flashMessages'
-import { request, gql } from 'graphql-request'
-import useUserApi from '../../graphql/userApi'
 
 const Index: NextPage = () => {
   const [users, setUsers] = useState([] as User[])
