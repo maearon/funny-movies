@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project is a full-stack web application for sharing YouTube videos with followers. It was built as a **Remitano developer technical assessment** (round 2), aligned with the brief in `J9ProjectForRemitanoDeveloperYoutubeVideoSharingApp.md`.
+This project is a full-stack web application for sharing YouTube videos with  all users logged in online.
 
 **Purpose:** registered users paste a normal YouTube URL (watch, shorts, embed, or `youtu.be`). The app resolves the video ID, loads the title via **YouTube Data API v3**, stores the **original URL**, **title**, and **`youtube_id`** in PostgreSQL, and shows the video in an embed iframe. **Google OAuth** is used only for the YouTube **rate (like/dislike)** API, which requires a user access token.
 
@@ -13,8 +13,6 @@ This project is a full-stack web application for sharing YouTube videos with fol
 - **Real-time notifications:** when a user shares a video, other logged-in clients receive a WebSocket message (Action Cable) and a **toast** (react-toastify / `flashMessages`).
 - Background job (`NotifyUsersJob`) broadcasts the notification after the micropost is saved (Solid Queue in production).
 - Unit tests: Vitest (URL parsing) and Rails minitest (micropost create + job broadcast).
-
-**Wireframes:** see `figma/Screenshot1.png` … `Screenshot3.png` in the repository (referenced in the assessment doc).
 
 **Repository layout**
 
@@ -201,12 +199,3 @@ Includes integration tests for authenticated micropost creation and job broadcas
 - **Solid Cable** (Rails 8) can use PostgreSQL for Cable traffic — fits **Neon** free tier without adding Redis.
 - **Solid Queue** uses PostgreSQL — no **Redis** required for this stack on Render’s free/hobby tier.
 - If you later switch to **Sidekiq** or Redis Action Cable, **Upstash Redis** has a usable free tier and works with TLS from Render/Vercel-style hosting.
-
----
-
-## Documentation & submission
-
-- Assessment checklist: `J9ProjectForRemitanoDeveloperYoutubeVideoSharingApp.md`
-- Submission link (per brief): `https://remi.group/project-for-remitano-developer-submission`
-
-Include your deployed URLs and this README when submitting.

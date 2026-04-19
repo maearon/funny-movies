@@ -13,6 +13,7 @@
         "sslmode",
         "starttls",
         "urlsafe",
-        "verceldb"
+        "verceldb",
+        "youtu"
     ]
 }

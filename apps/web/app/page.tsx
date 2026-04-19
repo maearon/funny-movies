@@ -21,6 +21,7 @@ import { fetchYoutubeVideoDetails } from "@/lib/youtubeApi";
 import { redirectToGoogleOAuth } from "@/lib/googleOAuth";
 
 const Home: NextPage = () => {
+  const [demoVideo, setDemoVideo] = useState<any>(null);
   const [page, setPage] = useState(1);
   const [feedItems, setFeedItems] = useState<Micropost[]>([]);
   const [total_count, setTotalCount] = useState(1);
@@ -33,6 +34,10 @@ const Home: NextPage = () => {
   const [errors, setErrors] = useState<ErrorMessageType>({});
   const { value: current_user, status } = useAppSelector(selectUser);
   const loading = status === "loading";
+
+  useEffect(() => {
+    fetchYoutubeVideoDetails("H4BB9eGUEaE").then(setDemoVideo);
+  }, []);
 
   const setFeeds = useCallback(async () => {
     try {
@@ -434,18 +439,18 @@ const Home: NextPage = () => {
           .
         </h2>
         <span className="content">
-          <b>SƠN TÙNG M-TP | SKY DECADE | Nắng Ấm Ngang Qua</b>
+          <b>{ demoVideo?.title || "Video Title" }</b>
           <Link
             target="_blank"
-            href="https://www.youtube.com/results?search_query=Sơn Tùng M-TP Official"
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(demoVideo?.channelTitle || "Channel Name")}`}
           >
             {" "}
-            (Sơn Tùng M-TP Official)
+            ({ demoVideo?.channelTitle || "Channel Name" })
           </Link>
           <div className="videoWrapper">
             <iframe
               title="Featured video"
-              src="https://www.youtube.com/embed/Zuk5zGv5Un4"
+              src="https://www.youtube.com/embed/H4BB9eGUEaE"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />
@@ -454,14 +459,14 @@ const Home: NextPage = () => {
             <button
               type="button"
               className="btn btn-default btn-sm"
-              onClick={() => void handleRate("Zuk5zGv5Un4", "like")}
+              onClick={() => void handleRate("H4BB9eGUEaE", "like")}
             >
               <i className="fa fa-thumbs-o-up" aria-hidden="true" /> Like
             </button>
             <button
               type="button"
               className="btn btn-default btn-sm"
-              onClick={() => void handleRate("Zuk5zGv5Un4", "dislike")}
+              onClick={() => void handleRate("H4BB9eGUEaE", "dislike")}
             >
               <i className="fa fa-thumbs-o-down" aria-hidden="true" /> Dislike
             </button>

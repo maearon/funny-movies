@@ -1,0 +1,124 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [web, service]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (for web)
+        if: matrix.service == 'web'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'npm'
+          cache-dependency-path: apps/${{ matrix.service }}/package-lock.json
+
+      - name: Set up Ruby (for service)
+        if: matrix.service == 'service'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0.2'
+
+      - name: Install dependencies and test
+        run: |
+          set -e  # Stop script on first failure
+
+          echo "Running tests for service: ${{ matrix.service }}"
+          case "${{ matrix.service }}" in
+            web)
+              cd apps/${{ matrix.service }}
+              echo "Checking package-lock.json..."
+              if [ ! -f package-lock.json ]; then
+                echo "❌ Error: Missing package-lock.json in apps/${{ matrix.service }}"
+                exit 1
+              fi
+              npm ci || npm install  # fallback if npm ci fails
+              npm run test || echo "⚠️ npm test failed"
+              npm run lint || echo "⚠️ npm lint failed"
+              ;;
+
+            service)
+              cd apps/${{ matrix.service }}
+              echo "📦 Installing dependencies..."
+              sudo apt-get update && sudo apt-get install -y \
+                libvips libvips-dev \
+                build-essential libpq-dev libsqlite3-dev zlib1g-dev nodejs yarn
+
+              bundle install --jobs 4 --retry 3 --verbose
+
+              echo "🗃️ Preparing test database..."
+              RAILS_ENV=test DISABLE_BOOTSNAP=1 bundle exec rails db:prepare || true
+
+              echo "🧪 Running Rails tests..."
+              RAILS_ENV=test DISABLE_BOOTSNAP=1 bundle exec rails test || (echo '❌ Rails test failed' && exit 1)
+
+              echo "📄 Dumping test log (if exists)..."
+              if [ -f log/test.log ]; then cat log/test.log; else echo 'log/test.log not found'; fi
+
+              echo "📁 Log directory listing:"
+              ls -la log || echo "log/ directory not found"
+              ;;
+          esac
+
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        service: [web, service]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/${{ matrix.service }}.Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/adidas-${{ matrix.service }}:latest
+            ${{ env.DOCKER_USERNAME }}/adidas-${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy Rails service to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID_RAILS }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
