@@ -18,7 +18,7 @@ const Edit = (props: {params: Promise<{slug: string[]}>}) => {
   const { reset_token, email } = 
   params.slug.length === 2 ? 
   // { reset_token: params.slug[0], email: params.slug[1] } 
-  { reset_token: params.slug[0], email: decodeURIComponent(params.slug[1]) } 
+  { reset_token: decodeURIComponent(params.slug[0]), email: decodeURIComponent(params.slug[1]) } 
   : { reset_token: '', email: '' };
   const myRef = useRef<HTMLInputElement>(null)
 
@@ -55,6 +55,7 @@ const Edit = (props: {params: Promise<{slug: string[]}>}) => {
           ...state,
           errorMessage: response.error,
         });
+        flashMessage('error', 'Maybe your account is not activated or the reset token is expired, please try resend account activation email or reset password email again')
       }
       if (response.flash?.[0] === "success") { // Case (4)
         flashMessage(...response.flash as [message_type: string, message: string])
@@ -64,6 +65,7 @@ const Edit = (props: {params: Promise<{slug: string[]}>}) => {
     })
     .catch(error => {
       console.log(error)
+      flashMessage('error', 'Maybe your account is not activated or the reset token is expired, please try resend account activation email or reset password email again')
     })
     e.preventDefault()
   }

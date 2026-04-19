@@ -1,5 +1,5 @@
 class Api::PasswordResetsController < Api::ApiController
-  before_action :authenticate!, except: %i[create update]
+  skip_before_action :authenticate!, only: %i[create update]
   before_action :set_user, only: %i[update]
   before_action :valid_user,       only: %i[update]
   before_action :check_expiration, only: %i[update]    # Case (1)

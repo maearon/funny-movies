@@ -1,11 +1,9 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from "axios"
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "@/lib/token"
 import { Nullable } from "@/types/common"
+import { apiBaseUrl } from "@/lib/env"
 
-// Base URL config
-const BASE_URL = process.env.NODE_ENV === "development"
-  ? "http://localhost:3000/api"
-  : "https://ruby-rails-boilerplate-3s9t.onrender.com/api"
+const BASE_URL = apiBaseUrl
 
 // CSRF & credentials setup
 axios.defaults.xsrfCookieName = "CSRF-TOKEN"
@@ -32,6 +30,10 @@ const dispatchRedirectToLogin = () => {
 API.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== "undefined" && config.headers) {
+      if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"]
+      }
+
       const token = getAccessToken()
       if (token) {
         config.headers["Authorization"] = `Bearer ${token}`
@@ -76,8 +78,14 @@ API.interceptors.response.use(
   
   async (error) => {
     const originalRequest = error.config
+    const isPublicEndpoint =
+      originalRequest.url?.includes("/password_resets") ||
+      originalRequest.url?.includes("/account_activations") ||
+      originalRequest.url?.includes("/login") ||
+      originalRequest.url?.includes("/signup") ||
+      originalRequest.url?.includes("/refresh");
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isPublicEndpoint) {
       originalRequest._retry = true
 
       if (isRefreshing) {

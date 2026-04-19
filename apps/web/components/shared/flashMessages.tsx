@@ -11,6 +11,7 @@ const flashMessage = (message_type: string, message: string) => {
       toast.success(message)
       break
     case "danger":
+    case "error":
       toast.error(message)
       break
     case "warning":

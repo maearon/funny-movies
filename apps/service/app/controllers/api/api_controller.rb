@@ -1,6 +1,7 @@
 class Api::ApiController < ActionController::API
   include ResponsesHandler
   include ErrorsHandler
+  before_action :authenticate!
 
   private
 

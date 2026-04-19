@@ -33,14 +33,14 @@ export default function Edit(props: EditProps) {
       .update(activation_token, email)
       .then((response) => {
         flashMessage("success", "The account has been activated. Please log in.");
-        setTimeout(() => {
-          router.push("/login");
-        }, 3000);
+        // setTimeout(() => {
+        //   router.push("/login");
+        // }, 3000);
       })
       .catch((error) => {
         console.error("Activation Error:", error);
         flashMessage("error", "Account activation failed. Please try again.");
-        router.push("/");
+        // router.push("/");
       });
   }, [activation_token, email, router]);
 
