@@ -1,0 +1,14 @@
+/* Bootstrap 3 fixed navbar spacing + readable links on gradient body */
+body {
+  padding-top: 70px;
+}
+
+.navbar-inverse .navbar-brand,
+.navbar-inverse .navbar-nav > li > a {
+  color: #9d9d9d;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-brand:hover {
+  color: #fff;
+}
