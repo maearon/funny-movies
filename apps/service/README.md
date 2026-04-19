@@ -1,34 +1,31 @@
-# README
+# Rails API (`apps/service`)
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Rails 8 API-only app: JWT sessions, microposts (YouTube shares), relationships, mailers.
 
-Things you may want to cover:
+## Stack highlights
 
-* Ruby version
+- **PostgreSQL** — primary DB (e.g. Neon).
+- **Action Cable** — mounted at `/cable`; clients authenticate with `?token=<JWT>` (see `app/channels/application_cable/connection.rb`).
+- **Solid Queue / Solid Cable** — jobs and Cable backed by DB in production (`config/cable.yml`, queue config).
 
-* System dependencies
+## Generated artifacts (reference)
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-```
-rails g model User name:string email:string password_digest:string  --skip-migration
-rails g model Micropost content:string title:string youtube_id:string user:references  --skip-migration
-rails g model Relationship follower_id:integer followed_id:integer  --skip-migration
-rails g model Notification --skip-migration
-rails g controller api/microposts index create
+```bash
+rails g model Micropost content:string title:string youtube_id:string user:references --skip-migration
 rails g job notify_users
 rails g channel notification
 ```
+
+## Tests
+
+```bash
+bin/rails test
+```
+
+Focus areas for this project: `test/controllers/api/microposts_controller_test.rb`, `test/jobs/notify_users_job_test.rb`.
+
+## Deployment
+
+Ensure **both** web and **job worker** processes run when using `NotifyUsersJob` + Solid Queue (e.g. Render **Background Worker** running `bin/jobs` or equivalent).
+
+See the repository root `README.md` for full setup, env vars, and reviewer instructions.

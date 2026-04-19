@@ -1,127 +1,212 @@
-# Youtube Video Sharing App
+# YouTube Video Sharing App
 
 ## Introduction
 
-Web to post your favorite Youtube embed link Save and History them.
-Project structure:
-- apps/web: React frontend
-- apps/service: Rails backend (with ActionCable)
-https://www.youtube.com/watch?v=pRdv7lDoqIo&list=RDMMH4BB9eGUEaE&index=8
-https://www.youtube.com/embed/pRdv7lDoqIo?si=l43z5RVM1Df8ioYD
+This project is a full-stack web application for sharing YouTube videos with followers. It was built as a **Remitano developer technical assessment** (round 2), aligned with the brief in `J9ProjectForRemitanoDeveloperYoutubeVideoSharingApp.md`.
+
+**Purpose:** registered users paste a normal YouTube URL (watch, shorts, embed, or `youtu.be`). The app resolves the video ID, loads the title via **YouTube Data API v3**, stores the **original URL**, **title**, and **`youtube_id`** in PostgreSQL, and shows the video in an embed iframe. **Google OAuth** is used only for the YouTube **rate (like/dislike)** API, which requires a user access token.
+
+**Key features**
+
+- JWT-based registration/login (Rails API + Next.js client).
+- Feed of shared videos with pagination (Micropost list).
+- **Real-time notifications:** when a user shares a video, other logged-in clients receive a WebSocket message (Action Cable) and a **toast** (react-toastify / `flashMessages`).
+- Background job (`NotifyUsersJob`) broadcasts the notification after the micropost is saved (Solid Queue in production).
+- Unit tests: Vitest (URL parsing) and Rails minitest (micropost create + job broadcast).
+
+**Wireframes:** see `figma/Screenshot1.png` … `Screenshot3.png` in the repository (referenced in the assessment doc).
+
+**Repository layout**
+
+| Path | Stack | Role |
+|------|--------|------|
+| `apps/web` | Next.js 16, React 19, Bootstrap 3 (CSS), Redux | Frontend |
+| `apps/service` | Rails 8 API, PostgreSQL, Action Cable, Solid Queue/Cable | Backend |
+
+**Deployed (example)**
+
+- Frontend: Vercel — `https://funny-movies-pied.vercel.app`
+- Backend: Render — `https://ruby-rails-boilerplate-3s9t.onrender.com`
+
+Configure the frontend with `NEXT_PUBLIC_BACKEND_ORIGIN` pointing at your Rails host so REST and WebSockets use the same origin.
 
 ---
 
 ## Prerequisites
 
-Docker Desktop (If win10/win11) or Docker Linux (Ubuntu)
-Git git version 2.53.0.windows.2
-NPM 11.12.1
-NodeJS v25.9.0
-Ubuntu Subsystem Win11
-VSCode 1.115.0
-ruby "4.0.2"
-Rails version: 8.1.3
+| Tool | Notes |
+|------|--------|
+| Git | Frequent commits expected by the brief |
+| Node.js | e.g. v22+ (project tested with modern LTS) |
+| npm | Package manager for `apps/web` |
+| Ruby / Rails | Ruby 4.x, Rails 8.1.x for `apps/service` |
+| PostgreSQL | Local or hosted (e.g. Neon); DB URL via env |
+| Docker (optional) | For containerized local run if you add/keep compose |
 
 ---
 
-## Installation & Configuration:
-```
+## Installation & configuration
+
+### Clone
+
+```bash
 git clone git@github.com:maearon/remitano-test.git
+cd remitano-test
 ```
-install Docker Desktop (If win10/win11) https://www.docker.com/products/docker-desktop/ 
-install Linux on Windows with WSL https://learn.microsoft.com/vi-vn/windows/wsl/install
-install ruby "3.4.2" Rails version: 8.0.2 https://gorails.com/setup/windows/11
+
+### Backend (`apps/service`)
+
+```bash
+cd apps/service
+bundle install
 ```
-cd /mnt/c/Users/manhn/CODE/REMITANO-TEST/apps
-rails new service -d postgresql --api
-bundle add dotenv-rails
-bundle add jwt
-mkdir -p app/services/jwt/user
-touch app/services/jwt/user/encode_token_service.rb
-touch app/services/jwt/user/decode_token_service.rb
-touch app/models/concerns/user_jwt_claims.rb
-mkdir -p app/views/api/sessions
-touch app/views/api/sessions/create.json.jbuilder
-touch app/views/api/sessions/index.json.jbuilder
-mkdir -p app/views/api/static_pages
-touch app/views/api/static_pages/home.json.jbuilder
-bundle add kaminari
+
+Copy environment template (create `.env` or use hosting env vars). Required concepts:
+
+- `POSTGRES_*` or `POSTGRES_URL` / `DATABASE_URL` — database connection.
+- `RAILS_MASTER_KEY` or credentials for `secret_key_base` (JWT signing).
+- Optional: SMTP vars for mailers.
+
+### Frontend (`apps/web`)
+
+```bash
+cd apps/web
+npm install
 ```
-```
-rails generate mailer UserMailer
-touch app/views/user_mailer/account_activation.html.erb
-touch app/views/user_mailer/account_activation.text.erb
-touch app/views/user_mailer/password_reset.html.erb
-touch app/views/user_mailer/password_reset.text.erb
-```
-Create API key on https://console.cloud.google.com/apis/credentials to get Data From Youtube API V3
-```
-npm i @reduxjs/toolkit axios formik react-js-pagination react-loading-skeleton react-redux react-toastify redux yup @tanstack/query-async-storage-persister @tanstack/react-query @tanstack/react-query-devtools @tanstack/react-query-persist-client
-```
-```
-npm i --save-dev @types/react-js-pagination
-```
+
+Create `.env.local` (never commit secrets). Typical variables:
+
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_BACKEND_ORIGIN` | Rails base URL, e.g. `http://localhost:3000` or your Render URL |
+| `NEXT_PUBLIC_API_KEY` | YouTube Data API key (snippet lookup when sharing) |
+| `NEXT_PUBLIC_CLIENT_ID` | Google OAuth Web client ID (YouTube rating scope) |
+| `NEXT_PUBLIC_REDIRECT_URI` | Must match Google Cloud Console (e.g. `http://localhost:3001/` for dev) |
+| `NEXT_PUBLIC_SCOPE` | Optional; defaults to `https://www.googleapis.com/auth/youtube.force-ssl` in code |
+| `GOOGLE_CLIENT_ID` | Same as `NEXT_PUBLIC_CLIENT_ID` (used by `/api/google-token`) |
+| `GOOGLE_CLIENT_SECRET` | Web client secret — **server only** |
+| `GOOGLE_OAUTH_REDIRECT_URI` | Same as `NEXT_PUBLIC_REDIRECT_URI` |
+
+Token exchange runs through **`POST /api/google-token`** so the client secret is not exposed in the browser.
 
 ---
 
-## Database Setup
-no need action create one if you need a new on https://neon.com/
+## Database setup
+
+The canonical schema for local use should live in `apps/service/db/schema.rb` after migrations. This repo also keeps **`db/migrate_old`** and SQL notes where the hosted DB was altered manually (e.g. adding `title`, `youtube_id` on `microposts`, and `VIDEO_SHARED` on `NotificationType`) when migrations were not run against Neon.
+
+1. Create a PostgreSQL database (local or Neon).
+2. Set `DATABASE_URL` / `POSTGRES_URL` / per-field `POSTGRES_*` as in `config/database.yml`.
+3. When possible, run:
+
+```bash
+cd apps/service
+bin/rails db:prepare
 ```
-postgres://default:z9GYTlrXa8Qx@ep-bold-voice-a4yp8xc9-pooler.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require
+
+If you only use a remote DB that already has tables, point Rails at that URL and avoid destructive commands.
+
+---
+
+## Running the application
+
+**Ports (default in this repo)**
+
+- Rails API + Action Cable: **3000**
+- Next.js: **3001** (`npm run dev` in `apps/web`)
+
+**Rails**
+
+```bash
+cd apps/service
+bin/rails server -p 3000
 ```
 
+**Next.js**
+
+```bash
+cd apps/web
+npm run dev
+```
+
+Open `http://localhost:3001`.
+
+**CORS** is configured in `apps/service/config/initializers/cors.rb` for `http://localhost:3001` and the Vercel app origin.
+
+**Action Cable**
+
+- Browser connects to `{NEXT_PUBLIC_BACKEND_ORIGIN}/cable?token=<JWT>`.
+- Connection rejects guests without a valid JWT.
+
+**Background jobs (notifications)**
+
+- In production, Solid Queue processes `NotifyUsersJob`. Ensure a **worker process** runs (e.g. Render background worker or `bin/jobs`) so broadcasts are not stuck in the queue.
+
 ---
 
-## Running the Application
-Way1:
-In VSCode run npm start in terminal
-In UbuntuWin11 run rails s in terminal
-Way2:
-docker-compose build
-docker-compose up
+## Docker deployment (optional)
+
+Add or adjust `docker-compose` at the repo root so reviewers can run API + web + DB with one command. Build images from `apps/service` (Dockerfile if present) and `apps/web`, pass env files, and publish ports 3000 / 3001.
 
 ---
 
-## (BE/FS) Docker Deployment
-deploy Frontend apps/web to Vercel
-deploy Backend apps/service to Render with docker mode
+## Usage (for reviewers)
+
+1. Register and log in.
+2. On **Home** or **Share a movie**, paste a YouTube URL such as  
+   `https://www.youtube.com/watch?v=pRdv7lDoqIo&list=...`  
+   The app extracts the id, fetches the title from YouTube Data API v3, and saves **original URL + title + youtube_id**.
+3. The feed shows the embed (`/embed/{youtube_id}`) and a link to the **original** URL.
+4. Click **Like / Dislike** (Font Awesome icons): if not connected to Google for YouTube, you are redirected through OAuth; tokens are stored as `youtube_oauth_token` (separate from the app JWT).
+5. With two browsers/sessions, share a video as user A: user B should see a **toast** with sharer name and video title (Action Cable + `NotifyUsersJob`).
 
 ---
 
-## Usage
+## Testing
+
+**Frontend (Vitest)**
+
+```bash
+cd apps/web
+npm test
+```
+
+Covers YouTube URL parsing (`lib/youtube.test.ts`).
+
+**Backend (Rails)**
+
+```bash
+cd apps/service
+bin/rails test
+```
+
+Includes integration tests for authenticated micropost creation and job broadcast (see `test/controllers/api/microposts_controller_test.rb`, `test/jobs/notify_users_job_test.rb`).
 
 ---
 
 ## Troubleshooting
 
-```
-sudo apt clean
-sudo apt update
-sudo apt --fix-missing update
-sudo apt upgrade -y
-sudo apt install xdg-utils
-xdg-open .
-explorer.exe .
-manhn@DESKTOP-96F067C:/mnt/c/Users/manhn/CODE/REMITANO-TEST/apps/service$ ls
-Gemfile
-rm -rf apps/service/.git
-git rm -r --cached .
-```
-Reload VSCode
-```
-Ctrl + Shift + P → Reload Window
-```
-👉 In the new Ruby/Rails (Rails 8 + Ruby 4),
-`get` now only accepts one argument, unlike the previous method of passing multiple symbols.
-```
-member do
-  get :following, :followers
-end
-```
-need to
-```
-member do
-  get :following
-  get :followers
-end
-```
+| Issue | What to try |
+|-------|-------------|
+| WebSocket fails on Vercel → Render | Set `NEXT_PUBLIC_BACKEND_ORIGIN` to the Render HTTPS URL; ensure Render allows your Vercel origin in `config/environments/production.rb` (`action_cable.allowed_request_origins`). |
+| Notifications only after refresh | Run Solid Queue worker / `bin/jobs` so `NotifyUsersJob` executes. |
+| FormData micropost errors | Axios must not force `application/json` on multipart bodies (handled in `components/shared/api/index.tsx`). |
+| OAuth redirect mismatch | `NEXT_PUBLIC_REDIRECT_URI` / `GOOGLE_OAUTH_REDIRECT_URI` must exactly match Google Cloud Console. |
+| JWT/Cable disconnect | Token must be passed as `token` query param; use the same access token as the REST API. |
+
+---
+
+## Production architecture notes (free tier friendly)
+
+- **Solid Cable** (Rails 8) can use PostgreSQL for Cable traffic — fits **Neon** free tier without adding Redis.
+- **Solid Queue** uses PostgreSQL — no **Redis** required for this stack on Render’s free/hobby tier.
+- If you later switch to **Sidekiq** or Redis Action Cable, **Upstash Redis** has a usable free tier and works with TLS from Render/Vercel-style hosting.
+
+---
+
+## Documentation & submission
+
+- Assessment checklist: `J9ProjectForRemitanoDeveloperYoutubeVideoSharingApp.md`
+- Submission link (per brief): `https://remi.group/project-for-remitano-developer-submission`
+
+Include your deployed URLs and this README when submitting.
