@@ -14,13 +14,14 @@ export interface ListParams {
 export interface Micropost {
   readonly id: number;
   content: string;
+  title?: string;
+  youtube_id?: string;
   gravatar_id?: string;
   image: string;
   size: number;
   timestamp: string;
   readonly user_id: string;
   user_name?: string;
-  title?: string;
   description?: string;
   videoId?: string;
   channelTitle?: string;
