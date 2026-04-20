@@ -191,7 +191,7 @@ Covers YouTube URL parsing (`lib/youtube.test.ts`).
 Install PostgreSQL 18 installer (Windows)
 
 ```bash
-cd apps/service
+cd /mnt/c/Users/manhn/CODE/funny-movies/apps/service/
 RAILS_ENV=test bin/rails db:drop db:create db:migrate
 bin/rails g migration AddRefreshTokenToUsers refresh_token:string refresh_token_expiration_at:datetime
 RAILS_ENV=test bin/rails db:migrate
@@ -206,6 +206,7 @@ bin/rails test test/models/micropost_test.rb
 bin/rails test test/models/relationship_test.rb
 bin/rails test
 bin/rails test test/integration/user_flow_test.rb
+bin/rails test test/integration/jwt_expire_flow_test.rb
 bin/rails test
 bin/rails test test/jobs/notify_users_job_test.rb
 ```

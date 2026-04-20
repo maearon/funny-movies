@@ -7,7 +7,7 @@ module ErrorsHandler
       rescue_from ActionController::RoutingError, with: :rescue404
       rescue_from ActiveRecord::RecordNotFound, with: :rescue404
     end
-    rescue_from JWT::DecodeError, with: :rescue400
+    rescue_from JWT::DecodeError, with: :rescue401
     rescue_from JWT::InvalidAudError, with: :rescue401
     rescue_from JWT::InvalidIssuerError, with: :rescue401
     rescue_from JWT::InvalidSubError, with: :rescue401
