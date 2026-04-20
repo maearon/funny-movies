@@ -190,6 +190,8 @@ Covers YouTube URL parsing (`lib/youtube.test.ts`).
 
 Install PostgreSQL 18 installer (Windows)
 
+- `POSTGRES_*_TEST` (`POSTGRES_DATABASE_TEST`, `POSTGRES_HOST_TEST`, `POSTGRES_USER_TEST`, `POSTGRES_PASSWORD_TEST`) — test database connection.
+
 ```bash
 cd /mnt/c/Users/manhn/CODE/funny-movies/apps/service/
 RAILS_ENV=test bin/rails db:drop db:create db:migrate
