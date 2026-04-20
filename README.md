@@ -204,6 +204,8 @@ bin/rails test
 bin/rails test test/models/user_test.rb
 bin/rails test test/models/micropost_test.rb
 bin/rails test test/models/relationship_test.rb
+bin/rails test
+bin/rails test test/integration/user_flow_test.rb
 ```
 
 Includes integration tests for authenticated micropost creation and job broadcast (see `test/controllers/api/microposts_controller_test.rb`, `test/jobs/notify_users_job_test.rb`).
