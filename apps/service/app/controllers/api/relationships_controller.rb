@@ -8,7 +8,13 @@ class Api::RelationshipsController < Api::ApiController
 
   def destroy
     relationship = current_user.active_relationships.find_by(followed_id: params[:id])
-    user = Relationship.find(relationship.id).followed
-    render json: { unfollow: true } if current_user.unfollow(user)
+
+    return render json: { error: ["Not following"] }, status: :not_found if relationship.nil?
+
+    user = relationship.followed
+
+    if current_user.unfollow(user)
+      render json: { unfollow: true }
+    end
   end
 end

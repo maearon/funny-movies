@@ -188,8 +188,18 @@ Covers YouTube URL parsing (`lib/youtube.test.ts`).
 
 **Backend (Rails)**
 
+Install PostgreSQL 18 installer (Windows)
+
 ```bash
 cd apps/service
+RAILS_ENV=test bin/rails db:drop db:create db:migrate
+bin/rails g migration AddRefreshTokenToUsers refresh_token:string refresh_token_expiration_at:datetime
+RAILS_ENV=test bin/rails db:migrate
+bin/rails routes | grep microposts
+bin/rails test test/controllers/api/microposts_controller_test.rb
+bin/rails test test/controllers/api/sessions_controller_test.rb
+bin/rails test test/controllers/api/relationships_controller.rb
+bin/rails test test/controllers/api/users_controller.rb
 bin/rails test
 ```
 

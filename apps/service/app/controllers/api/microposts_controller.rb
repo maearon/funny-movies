@@ -10,7 +10,7 @@ class Api::MicropostsController < Api::ApiController
       NotifyUsersJob.perform_later(@micropost.id)
       render json: { flash: [ "success", "Micropost created!" ] }
     else
-      render json: { error: @micropost.errors.full_messages }
+      render json: { error: @micropost.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

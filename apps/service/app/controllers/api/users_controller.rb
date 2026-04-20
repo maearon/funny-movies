@@ -23,6 +23,7 @@ class Api::UsersController < Api::ApiController
     if @user.save
       @user.create_activation_digest
       @user.send_activation_email
+      render json: { message: "User created" }, status: :created
     else
       response422_with_error(@user.errors.messages)
     end

@@ -128,7 +128,11 @@ class User < ApplicationRecord
 
   # Follow logic
   def follow(other_user)
-    following << other_user unless self == other_user
+    return false if self == other_user
+    return false if following?(other_user)
+
+    following << other_user
+    true
   end
 
   def unfollow(other_user)
