@@ -5,7 +5,7 @@ export function handleNetworkError(error: any): void {
     error.code = "ERR_NETWORK"
   }
 
-  // Có thể thêm alert/toast ở đây nếu muốn
+  // You can add alert/toast here if you want
   // flashMessage("error", "Lost connection to the server.")
   throw error
 }

@@ -20,9 +20,9 @@ export const useCurrentUser = () => {
       const user = await dispatch(fetchUser()).unwrap()
       return user
     },
-    enabled: !!token, // ✅ Chỉ chạy khi đã có token
+    enabled: !!token, // ✅ Only run when you have the token.
     staleTime: 1000 * 60 * 5,
-    retry: false, // ⛔ Đây chính là chặn retry nếu fetchUser bị lỗi (401, 403, etc.) infinite loops loading F5 avoided
+    retry: false, // ⛔ This is the key to preventing retry loops if fetchUser fails (401, 403, etc.)
     refetchOnWindowFocus: false,
   })
 }

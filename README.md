@@ -1,67 +1,14 @@
 # YouTube Video Sharing App
 
----
+This project is a full-stack web application for sharing YouTube videos among logged-in users in real time.
 
-## 📸 Screenshots
+---
 
 ![thumbnail 1](https://github.com/maearon/funny-movies/blob/main/image.png)
 
 ---
 
-## ⚡ Quick Demo (for reviewers)
-
-1. Open the app: https://funny-movies-pied.vercel.app  
-2. Login or register  
-3. Paste a YouTube link → click "Share"  
-4. Open another browser → login with another account  
-5. You should see a real-time notification (toast)
-
-Optional:
-- Click Like/Dislike → triggers Google OAuth flow
-
-## 🚀 Highlights
-
-- Real-time notifications using ActionCable (WebSocket)
-- Google OAuth integration for YouTube rating (like/dislike)
-- Well-covered with unit and integration tests using Vitest + React Testing Library + Rails Minitest
-- Mocked API & WebSocket for stable frontend testing
-- Clean separation: Next.js frontend + Rails API backend
-
-## 🏗 Architecture
-
-- Frontend: Next.js (Vercel)
-- Backend: Rails API (Render)
-- Realtime: ActionCable over WebSocket
-- Background jobs: Solid Queue (PostgreSQL)
-- Database: PostgreSQL (Neon)
-
-## 🧠 Technical Decisions
-
-- **Mocked WebSocket in frontend tests** instead of real ActionCable  
-  → avoids flaky tests and keeps CI stable
-
-- **Google OAuth separated from main JWT auth**  
-  → ensures app auth is independent from YouTube API permissions
-
-- **Solid Queue instead of Sidekiq/Redis**  
-  → simpler deployment on free-tier infrastructure (PostgreSQL only)
-
-- **Backend-driven notifications (NotifyUsersJob)**  
-  → ensures consistent real-time behavior across clients
-
-- **YouTube metadata fetched before saving**  
-  → guarantees consistent title data in database
-
-## ⚠️ Known Limitations
-
-- YouTube API quota limits may affect video metadata fetching
-- OAuth token is stored in localStorage (not refresh-token based)
-- No optimistic UI for video sharing
-- No E2E tests (Cypress) due to complexity of WebSocket + OAuth flows
-
 ## Introduction
-
-This project is a full-stack web application for sharing YouTube videos among logged-in users in real time.
 
 **Purpose:** registered users paste a normal YouTube URL (watch, shorts, embed, or `youtu.be`). The app resolves the video ID, loads the title via **YouTube Data API v3**, stores the **original URL**, **title**, and **`youtube_id`** in PostgreSQL, and shows the video in an embed iframe. **Google OAuth** is used only for the YouTube **rate (like/dislike)** API, which requires a user access token.
 
@@ -72,6 +19,13 @@ This project is a full-stack web application for sharing YouTube videos among lo
 - **Real-time notifications:** when a user shares a video, other logged-in clients receive a WebSocket message (Action Cable) and a **toast** (react-toastify / `flashMessages`).
 - Background job (`NotifyUsersJob`) broadcasts the notification after the micropost is saved (Solid Queue in production).
 - Unit tests: Vitest (URL parsing) and Rails minitest (micropost create + job broadcast).
+
+| Rails | Nature | Equivalent (common) |
+|------|-----------------------------------|----------------|
+| `ActionCable`          ✅                | Realtime WebSocket    | SignalR (.NET), Socket.IO |
+| `Cache (Rails.cache)`  ❌                | Key-value cache	Redis | Redis |
+| `ActiveJob + Queue`    ⚠️ (fake async)   | Background jobs       | RabbitMQ / Sidekiq / Hangfire |
+| `Notification DB`      ❌                | Database              | Database |
 
 **Repository layout**
 
@@ -166,13 +120,13 @@ Token exchange runs through **`POST /api/google-token`** so the client secret is
 
 The canonical schema for local use should live in `apps/service/db/schema.rb` after migrations. This repo also keeps **`db/migrate_old`** and SQL notes where the hosted DB was altered manually (e.g. adding `title`, `youtube_id` on `microposts`, and `VIDEO_SHARED` on `NotificationType`) when migrations were not run against Neon.
 
-1. Create a PostgreSQL database (local or Neon).
+1. Create a PostgreSQL database (local or Neon), copy all **`db/migrate_old`** to **`db/migrate`**
 2. Set `DATABASE_URL` / `POSTGRES_URL` / per-field `POSTGRES_*` as in `config/database.yml`.
 3. When possible, run:
 
 ```bash
 cd apps/service
-rails db:prepare
+rails db:drop db:create db:migrate
 ```
 
 If you only use a remote DB that already has tables, point Rails at that URL and avoid destructive commands.
@@ -277,11 +231,4 @@ Includes integration tests for authenticated micropost creation and job broadcas
 | FormData micropost errors | Axios must not force `application/json` on multipart bodies (handled in `components/shared/api/index.tsx`). |
 | OAuth redirect mismatch | `NEXT_PUBLIC_REDIRECT_URI` / `GOOGLE_OAUTH_REDIRECT_URI` must exactly match Google Cloud Console. |
 | JWT/Cable disconnect | Token must be passed as `token` query param; use the same access token as the REST API. |
-
----
-
-## Production architecture notes (free tier friendly)
-
-- **Solid Cable** (Rails 8) can use PostgreSQL for Cable traffic — fits **Neon** free tier without adding Redis.
-- **Solid Queue** uses PostgreSQL — no **Redis** required for this stack on Render’s free/hobby tier.
-- If you later switch to **Sidekiq** or Redis Action Cable, **Upstash Redis** has a usable free tier and works with TLS from Render/Vercel-style hosting.
+| Run `rm -f tmp/pids/server.pid` | If old pid file make app can not run rails s |

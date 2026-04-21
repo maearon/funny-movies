@@ -30,7 +30,7 @@ class UserFlowTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_not_nil @user.refresh_token
 
-    # generate access token (giống FE sẽ làm)
+    # generate access token (same as FE will do after login)
     token = Jwt::User::EncodeTokenService.call(@user.id).first
 
     # =========================

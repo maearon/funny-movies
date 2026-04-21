@@ -9,7 +9,7 @@ type Props = {
 };
 
 const ErrorMessage: React.FC<Props> = ({ errorMessage }) => {
-  // 👇 Normalize: nếu là mảng, gán key mặc định "base"
+  // 👇 Normalize: if it's an array, assign the default key "base".
   const normalizedError: ErrorMessageType = Array.isArray(errorMessage)
     ? { base: errorMessage }
     : errorMessage;

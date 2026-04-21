@@ -8,7 +8,7 @@ import flashMessage from "@/components/shared/flashMessages";
 // Kiểu dữ liệu cho params
 interface EditProps {
   params: Promise<{
-    slug: string[]; // slug là mảng chuỗi
+    slug: string[]; // slug is string array
   }>;
 }
 
@@ -16,19 +16,19 @@ export default function Edit(props: EditProps) {
   const params = use(props.params);
   const router = useRouter();
 
-  // Giải mã slug thành activation_token và email
+  // Decode slug to activation_token and email
   const activation_token = params.slug?.[0] || "";
   const email = params.slug?.[1] ? decodeURIComponent(params.slug[1]) : "";
 
   useEffect(() => {
     if (!activation_token || !email) {
-      // Nếu thiếu token hoặc email -> hiển thị lỗi và redirect
+      // If missing token or email -> display error and redirect
       flashMessage("error", "Invalid activation link");
       router.push("/");
       return;
     }
 
-    // Gọi API kích hoạt tài khoản
+    // Call API to activate account
     accountActivationApi
       .update(activation_token, email)
       .then((response) => {

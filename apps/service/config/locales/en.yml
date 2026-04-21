@@ -31,3 +31,5 @@ en:
   errors:
     messages:
       not_logged_in: "You need to log in first"
+      invalid_email_or_password: "Invalid email or password"
+      invalid_refresh_token: "Invalid refresh token"

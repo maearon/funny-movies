@@ -2,3 +2,5 @@ vi:
   errors:
     messages:
       not_logged_in: "Bạn cần đăng nhập trước"
+      invalid_email_or_password: "Email hoặc mật khẩu không hợp lệ"
+      invalid_refresh_token: "Token làm mới không hợp lệ"

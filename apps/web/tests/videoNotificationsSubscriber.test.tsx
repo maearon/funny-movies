@@ -38,7 +38,7 @@ describe('VideoNotificationsSubscriber', () => {
   })
 
   // ========================
-  // 1. Không subscribe nếu chưa login
+  // 1. Do not subscribe if you are not logged in.
   // ========================
   it('does not subscribe if no user', () => {
     ;(useAppSelector as any).mockReturnValue({ value: null })
@@ -50,7 +50,7 @@ describe('VideoNotificationsSubscriber', () => {
   })
 
   // ========================
-  // 2. Không subscribe nếu không có token
+  // 2. Do not subscribe if no token is available.
   // ========================
   it('does not subscribe if no token', () => {
     ;(useAppSelector as any).mockReturnValue({
@@ -64,7 +64,7 @@ describe('VideoNotificationsSubscriber', () => {
   })
 
   // ========================
-  // 3. Subscribe thành công
+  // 3. Subscribe successfully
   // ========================
   it('subscribes when user and token exist', () => {
     ;(useAppSelector as any).mockReturnValue({
@@ -78,7 +78,7 @@ describe('VideoNotificationsSubscriber', () => {
   })
 
   // ========================
-  // 4. Nhận notification hợp lệ
+  // 4. Show valid notification
   // ========================
   it('shows flash message when receiving VIDEO_SHARED', () => {
     ;(useAppSelector as any).mockReturnValue({
@@ -102,7 +102,7 @@ describe('VideoNotificationsSubscriber', () => {
   })
 
   // ========================
-  // 5. Ignore nếu chính mình share
+  // 5. Ignore if user is the sharer
   // ========================
   it('does not notify if user is sharer', () => {
     ;(useAppSelector as any).mockReturnValue({
@@ -123,7 +123,7 @@ describe('VideoNotificationsSubscriber', () => {
   })
 
   // ========================
-  // 6. Ignore type khác
+  // 6. Ignore other event types
   // ========================
   it('ignores non VIDEO_SHARED events', () => {
     ;(useAppSelector as any).mockReturnValue({
@@ -141,7 +141,7 @@ describe('VideoNotificationsSubscriber', () => {
   })
 
   // ========================
-  // 7. Cleanup khi unmount
+  // 7. Cleanup on unmount
   // ========================
   it('cleans up subscription on unmount', () => {
     ;(useAppSelector as any).mockReturnValue({

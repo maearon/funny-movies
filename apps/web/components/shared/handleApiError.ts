@@ -29,10 +29,10 @@ export function handleApiError(error: any): ErrorMessageType {
     return { general: ["Cannot connect to the server. Please try again later."] }
   }
 
-  // 📩 Server trả về message rõ ràng
+  // 📩 The server returns a clear message.
   if (res?.message) return { general: [res.message] }
 
-  // ❌ Không có response: lỗi mạng
+  // ❌ No response: network error
   if (!error?.response) {
     return { general: ["Cannot connect to the server. Please try again later."] }
   }
