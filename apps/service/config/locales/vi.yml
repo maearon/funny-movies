@@ -1,0 +1,4 @@
+vi:
+  errors:
+    messages:
+      not_logged_in: "Bạn cần đăng nhập trước"
