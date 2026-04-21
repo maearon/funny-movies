@@ -1,8 +1,67 @@
 # YouTube Video Sharing App
 
+---
+
+## 📸 Screenshots
+
+![thumbnail 1](https://github.com/maearon/funny-movies/blob/main/image.png)
+
+---
+
+## ⚡ Quick Demo (for reviewers)
+
+1. Open the app: https://funny-movies-pied.vercel.app  
+2. Login or register  
+3. Paste a YouTube link → click "Share"  
+4. Open another browser → login with another account  
+5. You should see a real-time notification (toast)
+
+Optional:
+- Click Like/Dislike → triggers Google OAuth flow
+
+## 🚀 Highlights
+
+- Real-time notifications using ActionCable (WebSocket)
+- Google OAuth integration for YouTube rating (like/dislike)
+- Well-covered with unit and integration tests using Vitest + React Testing Library + Rails Minitest
+- Mocked API & WebSocket for stable frontend testing
+- Clean separation: Next.js frontend + Rails API backend
+
+## 🏗 Architecture
+
+- Frontend: Next.js (Vercel)
+- Backend: Rails API (Render)
+- Realtime: ActionCable over WebSocket
+- Background jobs: Solid Queue (PostgreSQL)
+- Database: PostgreSQL (Neon)
+
+## 🧠 Technical Decisions
+
+- **Mocked WebSocket in frontend tests** instead of real ActionCable  
+  → avoids flaky tests and keeps CI stable
+
+- **Google OAuth separated from main JWT auth**  
+  → ensures app auth is independent from YouTube API permissions
+
+- **Solid Queue instead of Sidekiq/Redis**  
+  → simpler deployment on free-tier infrastructure (PostgreSQL only)
+
+- **Backend-driven notifications (NotifyUsersJob)**  
+  → ensures consistent real-time behavior across clients
+
+- **YouTube metadata fetched before saving**  
+  → guarantees consistent title data in database
+
+## ⚠️ Known Limitations
+
+- YouTube API quota limits may affect video metadata fetching
+- OAuth token is stored in localStorage (not refresh-token based)
+- No optimistic UI for video sharing
+- No E2E tests (Cypress) due to complexity of WebSocket + OAuth flows
+
 ## Introduction
 
-This project is a full-stack web application for sharing YouTube videos with  all users logged in online.
+This project is a full-stack web application for sharing YouTube videos among logged-in users in real time.
 
 **Purpose:** registered users paste a normal YouTube URL (watch, shorts, embed, or `youtu.be`). The app resolves the video ID, loads the title via **YouTube Data API v3**, stores the **original URL**, **title**, and **`youtube_id`** in PostgreSQL, and shows the video in an embed iframe. **Google OAuth** is used only for the YouTube **rate (like/dislike)** API, which requires a user access token.
 
@@ -25,6 +84,17 @@ This project is a full-stack web application for sharing YouTube videos with  al
 
 - Frontend: Vercel — `https://funny-movies-pied.vercel.app`
 - Backend: Render — `https://funny-movies-b3dt.onrender.com`
+
+You can register a new account or use the demo accounts below (if still available):
+```bash
+Email: test@example.com
+Password: 123456
+```
+```bash
+Email: test2@example.com
+Password: 123456
+```
+Note: These accounts may be reset periodically.
 
 Configure the frontend with `NEXT_PUBLIC_BACKEND_ORIGIN` pointing at your Rails host so REST and WebSockets use the same origin.
 
@@ -101,16 +171,8 @@ The canonical schema for local use should live in `apps/service/db/schema.rb` af
 3. When possible, run:
 
 ```bash
-git config --global core.autocrlf input
-sudo apt update
-sudo apt install dos2unix
-find . -type f -exec dos2unix {} +
-git add --renormalize .
-git commit -m "Normalize line endings to LF"
 cd apps/service
-rails db:schema:dump
-bin/rails db:setup
-bin/rails db:prepare
+rails db:prepare
 ```
 
 If you only use a remote DB that already has tables, point Rails at that URL and avoid destructive commands.
@@ -144,7 +206,7 @@ docker-compose up
 
 ```bash
 cd apps/service
-bin/rails server -p 3000
+rails s
 ```
 
 **Next.js**
@@ -178,12 +240,9 @@ Add or adjust `docker-compose` at the repo root so reviewers can run API + web +
 ## Usage (for reviewers)
 
 1. Register and log in.
-2. On **Home** or **Share a movie**, paste a YouTube URL such as  
-   `https://www.youtube.com/watch?v=pRdv7lDoqIo&list=...`  
-   The app extracts the id, fetches the title from YouTube Data API v3, and saves **original URL + title + youtube_id**.
-3. The feed shows the embed (`/embed/{youtube_id}`) and a link to the **original** URL.
-4. Click **Like / Dislike** (Font Awesome icons): if not connected to Google for YouTube, you are redirected through OAuth; tokens are stored as `youtube_oauth_token` (separate from the app JWT).
-5. With two browsers/sessions, share a video as user A: user B should see a **toast** with sharer name and video title (Action Cable + `NotifyUsersJob`). After give Notification toast with User Name you can access `https://funny-movies-pied.vercel.app/users` to find User was Post Video by User Name and follow this User and Click to Logo Funny Movies to back Home Feed to watch new Video that this User was posted.
+2. Paste a YouTube URL → video will be shared to the feed.
+3. Other users receive real-time notification (toast).
+4. Like/Dislike requires Google OAuth connection
 
 ---
 
@@ -200,50 +259,9 @@ Covers YouTube URL parsing (`lib/youtube.test.ts`).
 
 **Backend (Rails)**
 
-Install PostgreSQL 18 installer (Windows)
-
-- `POSTGRES_*_TEST` (`POSTGRES_DATABASE_TEST`, `POSTGRES_HOST_TEST`, `POSTGRES_USER_TEST`, `POSTGRES_PASSWORD_TEST`) — test database connection.
-
-C:\Program Files\PostgreSQL\18\data\postgresql.conf need have listen_addresses = '*'
-C:\Program Files\PostgreSQL\18\data\pg_hba.conf need add host    all             all             0.0.0.0/0               scram-sha-256 to up hosts block
 ```bash
-ip route | grep default 
-```
-(run in Ubuntu WSL to get POSTGRES_HOST_TEST)
-
-```bash
-netsh advfirewall set allprofiles state off
-```
-(if public port 5432 postgres for Ubuntu WSL in FirewallWin11 not success)
-
-```bash
-cd /mnt/c/Users/manhn/CODE/funny-movies/apps/service/
-RAILS_ENV=test bin/rails db:drop db:create db:migrate
-bin/rails g migration AddRefreshTokenToUsers refresh_token:string refresh_token_expiration_at:datetime
-RAILS_ENV=test bin/rails db:migrate
-bin/rails routes | grep microposts
-bin/rails test test/controllers/api/microposts_controller_test.rb
-bin/rails test test/controllers/api/sessions_controller_test.rb
-bin/rails test test/controllers/api/relationships_controller.rb
-bin/rails test test/controllers/api/users_controller.rb
-bin/rails test
-bin/rails test test/models/user_test.rb
-bin/rails test test/models/micropost_test.rb
-bin/rails test test/models/relationship_test.rb
-bin/rails test
-bin/rails test test/integration/user_flow_test.rb
-bin/rails test test/integration/jwt_expire_flow_test.rb
-bin/rails test
-bin/rails test test/jobs/notify_users_job_test.rb
-bin/rails test
-bin/rails test test/mailers/user_mailer_test.rb
-# Preview this email at
-# http://localhost:3000/rails/mailers/user_mailer/account_activation
-# Preview this email at
-# http://localhost:3000/rails/mailers/user_mailer/password_reset
-bin/rails test
-bin/rails test test/channels/connection_test.rb
-bin/rails test test/channels/notification_channel_test.rb
+cd apps/service
+rails test
 ```
 
 Includes integration tests for authenticated micropost creation and job broadcast (see `test/controllers/api/microposts_controller_test.rb`, `test/jobs/notify_users_job_test.rb`).
