@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { embedUrlFromVideoId, extractYoutubeVideoId } from "./youtube";
+import { embedUrlFromVideoId, extractYoutubeVideoId } from "@/lib/youtube";
 
 describe("extractYoutubeVideoId", () => {
   it("parses watch URLs with extra query params", () => {

@@ -3,11 +3,9 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, {  useEffect, useRef, useState } from 'react'
-import sessionApi, { Response } from '../../components/shared/api/sessionApi'
 import flashMessage from '../../components/shared/flashMessages'
-import { ErrorMessage, Field, Form, Formik, FormikProps, useFormik, withFormik } from 'formik'
+import { ErrorMessage, Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
-// import TextError from '../../components/shared/TextError'
 import ShowErrors, { ErrorMessageType } from '@/components/shared/errorMessages';
 import { useAppSelector } from '@/redux/hooks';
 import { selectUser } from '@/redux/session/sessionSlice';
