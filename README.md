@@ -39,7 +39,7 @@ Configure the frontend with `NEXT_PUBLIC_BACKEND_ORIGIN` pointing at your Rails 
 | npm | Package manager for `apps/web` |
 | Ruby / Rails | Ruby 4.x, Rails 8.1.x for `apps/service` |
 | PostgreSQL | Local or hosted (e.g. Neon); DB URL via env |
-| Docker (optional) | For containerized local run if you add/keep compose |
+| Docker Desktop Win 11 or Docker Ubuntu (optional) | For containerized local run if you add/keep compose |
 
 ---
 
@@ -53,6 +53,8 @@ cd funny-movies
 ```
 
 ### Backend (`apps/service`)
+
+Install Ubuntu WSL Win 11
 
 ```bash
 cd apps/service
@@ -119,8 +121,18 @@ If you only use a remote DB that already has tables, point Rails at that URL and
 
 **Docker**
 
+**Start all services:**
 ```bash
-docker compose up --build
+# Clean previous containers (if needed)
+docker stop $(docker ps -aq)
+docker container rm $(docker container ls -aq)
+docker rmi -f $(docker images -aq)
+docker volume rm $(docker volume ls -q)
+docker network prune -f
+
+# Build and start services
+docker-compose build --no-cache
+docker-compose up
 ```
 
 **Ports (default in this repo)**
@@ -192,6 +204,18 @@ Install PostgreSQL 18 installer (Windows)
 
 - `POSTGRES_*_TEST` (`POSTGRES_DATABASE_TEST`, `POSTGRES_HOST_TEST`, `POSTGRES_USER_TEST`, `POSTGRES_PASSWORD_TEST`) — test database connection.
 
+C:\Program Files\PostgreSQL\18\data\postgresql.conf need have listen_addresses = '*'
+C:\Program Files\PostgreSQL\18\data\pg_hba.conf need add host    all             all             0.0.0.0/0               scram-sha-256 to up hosts block
+```bash
+ip route | grep default 
+```
+(run in Ubuntu WSL to get POSTGRES_HOST_TEST)
+
+```bash
+netsh advfirewall set allprofiles state off
+```
+(if public port 5432 postgres for Ubuntu WSL in FirewallWin11 not success)
+
 ```bash
 cd /mnt/c/Users/manhn/CODE/funny-movies/apps/service/
 RAILS_ENV=test bin/rails db:drop db:create db:migrate
@@ -211,6 +235,15 @@ bin/rails test test/integration/user_flow_test.rb
 bin/rails test test/integration/jwt_expire_flow_test.rb
 bin/rails test
 bin/rails test test/jobs/notify_users_job_test.rb
+bin/rails test
+bin/rails test test/mailers/user_mailer_test.rb
+# Preview this email at
+# http://localhost:3000/rails/mailers/user_mailer/account_activation
+# Preview this email at
+# http://localhost:3000/rails/mailers/user_mailer/password_reset
+bin/rails test
+bin/rails test test/channels/connection_test.rb
+bin/rails test test/channels/notification_channel_test.rb
 ```
 
 Includes integration tests for authenticated micropost creation and job broadcast (see `test/controllers/api/microposts_controller_test.rb`, `test/jobs/notify_users_job_test.rb`).

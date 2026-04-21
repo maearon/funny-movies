@@ -31,6 +31,8 @@ Rails.application.configure do
 
   # define SMTP settings for Action Mailer to send emails through Gmail's SMTP server.
   config.action_mailer.delivery_method = :smtp
+  config.action_mailer.show_previews = true
+  config.consider_all_requests_local = true
 
   # Configure SMTP settings for Gmail. Note: In production, you should use environment variables to store sensitive information like email and password instead of hardcoding them. 
   config.action_mailer.smtp_settings = {

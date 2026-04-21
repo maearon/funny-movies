@@ -52,6 +52,8 @@ Rails.application.configure do
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
+  config.action_mailer.show_previews = true
+  config.consider_all_requests_local = true
   config.action_mailer.raise_delivery_errors = true
 
   # define SMTP settings for Action Mailer to send emails through Gmail's SMTP server.
