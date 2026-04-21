@@ -183,7 +183,7 @@ Add or adjust `docker-compose` at the repo root so reviewers can run API + web +
    The app extracts the id, fetches the title from YouTube Data API v3, and saves **original URL + title + youtube_id**.
 3. The feed shows the embed (`/embed/{youtube_id}`) and a link to the **original** URL.
 4. Click **Like / Dislike** (Font Awesome icons): if not connected to Google for YouTube, you are redirected through OAuth; tokens are stored as `youtube_oauth_token` (separate from the app JWT).
-5. With two browsers/sessions, share a video as user A: user B should see a **toast** with sharer name and video title (Action Cable + `NotifyUsersJob`).
+5. With two browsers/sessions, share a video as user A: user B should see a **toast** with sharer name and video title (Action Cable + `NotifyUsersJob`). After give Notification toast with User Name you can access `https://funny-movies-pied.vercel.app/users` to find User was Post Video by User Name and follow this User and Click to Logo Funny Movies to back Home Feed to watch new Video that this User was posted.
 
 ---
 
