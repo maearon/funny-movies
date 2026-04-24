@@ -331,7 +331,7 @@ const Home: NextPage = () => {
               className="btn btn-primary"
               data-disable-with="Post"
             />
-            <span className="image">
+            {/* <span className="image">
               <input
                 ref={inputImage}
                 accept="image/jpeg,image/gif,image/png"
@@ -341,7 +341,7 @@ const Home: NextPage = () => {
                 onChange={handleImageInput}
                 className="form-control-file"
               />
-            </span>
+            </span> */}
           </form>
         </section>
       </aside>
