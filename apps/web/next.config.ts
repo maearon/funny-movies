@@ -24,10 +24,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    // dangerouslyAllowSVG: true,
-    // dangerouslyAllowLocalIP: true,
-    // https://res.cloudinary.com/dq7vadalc/image/upload/5c3j3nnlsl9i08hrq1zedgdb2j2m.jpg?_a=BACJ3SAE
-    // https://github.com/maearon/adidas-microservices/blob/main/apps/ruby-rails-boilerplate/app/controllers/api/admin/products_controller.rb
+    dangerouslyAllowLocalIP: true,
   },
 };
 

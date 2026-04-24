@@ -2,12 +2,6 @@
 
 This project is a full-stack web application for sharing YouTube videos among logged-in users in real time.
 
----
-
-![thumbnail 1](https://github.com/maearon/funny-movies/blob/main/image.png)
-
----
-
 ## Introduction
 
 **Purpose:** registered users paste a normal YouTube URL (watch, shorts, embed, or `youtu.be`). The app resolves the video ID, loads the title via **YouTube Data API v3**, stores the **original URL**, **title**, and **`youtube_id`** in PostgreSQL, and shows the video in an embed iframe. **Google OAuth** is used only for the YouTube **rate (like/dislike)** API, which requires a user access token.
@@ -91,6 +85,7 @@ Copy environment template (create `.env` or use hosting env vars). Required conc
 - `RAILS_MASTER_KEY` or credentials for `secret_key_base` (JWT signing).
 - `FRONTEND_URL` for use in mail templates.
 - Optional: `SMTP_*` (`SMTP_USERNAME`, `SMTP_PASSWORD`) vars for mailers.
+- `CLOUDINARY_CLOUD_*` (`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`) — storage by cloudinary cdn.
 
 ### Frontend (`apps/web`)
 

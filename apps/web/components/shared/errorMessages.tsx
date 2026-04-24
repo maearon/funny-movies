@@ -5,7 +5,7 @@ export type ErrorMessageType = {
 };
 
 type Props = {
-  errorMessage: ErrorMessageType | string[]; // 👈 Cho phép nhận cả mảng
+  errorMessage: ErrorMessageType | string[]; // 👈 Allows receiving entire arrays
 };
 
 const ErrorMessage: React.FC<Props> = ({ errorMessage }) => {
