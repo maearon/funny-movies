@@ -56,6 +56,7 @@ export interface CreateMicropostParams {
   content: string
   title: string
   youtube_id: string
+  image: File
 }
 
 const micropostApi = {
@@ -70,6 +71,9 @@ const micropostApi = {
     fd.append("micropost[content]", params.content)
     fd.append("micropost[title]", params.title)
     fd.append("micropost[youtube_id]", params.youtube_id)
+    if (params.image) {
+      fd.append("micropost[image]", params.image)
+    }
     return API.post(url, fd)
   },
 

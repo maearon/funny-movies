@@ -4,9 +4,9 @@ class User < ApplicationRecord
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email,
-          presence: true,
-          uniqueness: { case_sensitive: false },
-          format: { with: VALID_EMAIL_REGEX } 
+    presence: true,
+    uniqueness: { case_sensitive: false },
+    format: { with: VALID_EMAIL_REGEX }
   # Associations
   include RefreshTokenUpdatable
   # == Associations
@@ -45,12 +45,6 @@ class User < ApplicationRecord
 
   before_save :downcase_email
 
-  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
-  validates :email,
-            presence: true,
-            uniqueness: true,
-            format: { with: VALID_EMAIL_REGEX }
-
   validates :password,
             presence: true,
             length: { minimum: 6 },
@@ -61,7 +55,7 @@ class User < ApplicationRecord
     following_ids = "SELECT followed_id FROM relationships WHERE follower_id = :user_id"
 
     Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id", user_id: id)
-             .includes(:user)
+             .includes(:user, image_attachment: :blob)
              .order(created_at: :desc)
   end
 

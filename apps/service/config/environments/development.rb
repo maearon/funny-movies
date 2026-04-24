@@ -27,7 +27,7 @@ Rails.application.configure do
   config.cache_store = :memory_store
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  config.active_storage.service = :cloudinary
 
   # define SMTP settings for Action Mailer to send emails through Gmail's SMTP server.
   config.action_mailer.delivery_method = :smtp

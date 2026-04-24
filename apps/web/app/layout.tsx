@@ -69,10 +69,10 @@ export default function RootLayout({
               {/* External scripts */}
               <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></Script>
               <Script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></Script>
-              <Script
+              {/* <Script
                 src="https://kit.fontawesome.com/fbadad80a0.js"
                 crossOrigin="anonymous"
-              ></Script>
+              ></Script> */}
             </div>
           </body>
         </html>

@@ -8,6 +8,7 @@ json.feed_items do
     json.content i.content
     json.title i.title
     json.youtube_id i.youtube_id
+    json.image i.image.attached? ? i.image.url : nil
     json.timestamp time_ago_in_words(i.created_at)
   end
 end

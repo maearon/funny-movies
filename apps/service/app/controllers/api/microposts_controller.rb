@@ -3,8 +3,12 @@ class Api::MicropostsController < Api::ApiController
   before_action :correct_user, only: :destroy
 
   def create
-    @micropost = Micropost.new(micropost_params)
-    @micropost.user_id = current_user.id
+    # @micropost = Micropost.new(micropost_params)
+    @micropost = Micropost.new(micropost_params.except(:image))
+    @micropost.image.attach(params[:micropost][:image]) if params[:micropost] && params[:micropost][:image].present?
+    @micropost.content = micropost_params[:content] if micropost_params[:content].present?
+    @micropost.user_id = current_user.id if current_user.present?
+    # @micropost.user_id = current_user.id
 
     if @micropost.save
       NotifyUsersJob.perform_later(@micropost.id)
@@ -22,7 +26,7 @@ class Api::MicropostsController < Api::ApiController
   private
 
   def micropost_params
-    params.require(:micropost).permit(:content, :title, :youtube_id)
+    params.require(:micropost).permit(:content, :title, :youtube_id, :image)
   end
 
   def correct_user

@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import styles from "./page.module.css";
 import Link from "next/link";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import Pagination from "react-js-pagination";
 import Skeleton from "react-loading-skeleton";
 import micropostApi, {
@@ -34,6 +34,9 @@ const Home: NextPage = () => {
   const [errors, setErrors] = useState<ErrorMessageType>({});
   const { value: current_user, status } = useAppSelector(selectUser);
   const loading = status === "loading";
+  const [image, setImage] = useState(null)
+  const [imageName, setImageName] = useState('')
+  const inputImage = useRef() as MutableRefObject<HTMLInputElement>
 
   useEffect(() => {
     fetchYoutubeVideoDetails("H4BB9eGUEaE").then(setDemoVideo);
@@ -169,6 +172,25 @@ const Home: NextPage = () => {
     setPage(pageNumber);
   };
 
+
+  const handleContentInput = (e: any) => {
+    setContent(e.target.value)
+  }
+
+  const handleImageInput = (e: any) => {
+    if (e.target.files[0]) {
+      const size_in_megabytes = e.target.files[0].size/1024/1024
+      if (size_in_megabytes > 512) {
+        alert("Maximum file size is 512MB. Please choose a smaller file.")
+        setImage(null)
+        e.target.value = null
+      } else {
+        setImage(e.target.files[0])
+        setImageName(e.target.files[0].name)
+      }
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = content.trim();
@@ -189,6 +211,7 @@ const Home: NextPage = () => {
         content: trimmed,
         title: details.title,
         youtube_id: videoId,
+        image: image as unknown as File,
       });
 
       if (data.flash) {
@@ -295,6 +318,7 @@ const Home: NextPage = () => {
                 name="micropost[content]"
                 id="micropost_content"
                 value={content}
+                // onChange={handleContentInput}
                 onChange={(e) => setContent(e.target.value)}
                 rows={3}
               />
@@ -307,6 +331,17 @@ const Home: NextPage = () => {
               className="btn btn-primary"
               data-disable-with="Post"
             />
+            <span className="image">
+              <input
+                ref={inputImage}
+                accept="image/jpeg,image/gif,image/png"
+                type="file"
+                name="micropost[image]"
+                id="micropost_image"
+                onChange={handleImageInput}
+                className="form-control-file"
+              />
+            </span>
           </form>
         </section>
       </aside>
@@ -399,6 +434,17 @@ const Home: NextPage = () => {
                         Dislike
                       </button>
                     </div>
+                    {i.image && (
+                      <Image
+                        src={i.image}
+                        alt="Example User"
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        style={{ width: '100%', height: 'auto' }}
+                        priority
+                      />
+                    )}
                   </span>
                   <span className="timestamp">
                     {"Shared " + i.timestamp + " ago. "}
