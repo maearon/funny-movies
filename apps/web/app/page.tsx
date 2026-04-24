@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import styles from "./page.module.css";
 import Link from "next/link";
-import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Pagination from "react-js-pagination";
 import Skeleton from "react-loading-skeleton";
 import micropostApi, {
@@ -36,7 +36,7 @@ const Home: NextPage = () => {
   const loading = status === "loading";
   const [image, setImage] = useState(null)
   const [imageName, setImageName] = useState('')
-  const inputImage = useRef() as MutableRefObject<HTMLInputElement>
+  const inputImage = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     fetchYoutubeVideoDetails("H4BB9eGUEaE").then(setDemoVideo);
