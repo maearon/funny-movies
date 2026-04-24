@@ -33,15 +33,8 @@ class Api::UsersController < Api::ApiController
   end
 
   def update
-    if user_params[:avatar].present?
-      if @user.avatar.attached?
-        @user.avatar.purge
-      end
-      @user.avatar.attach(user_params[:avatar])
-    end
-    if @user.update(user_params.except(:avatar))
-      @user.update(avatarUrl: rails_blob_url(@user.avatar, only_path: false)) if @user.avatar.attached?
-      render json: { flash: ["success", "Avatar's User updated!"], avatarUrl: @user.avatarUrl }
+    if @user.update(user_params)
+      render json: { flash: ["success", "User updated!"] }, status: :ok
     else
       response422_with_error(@user.errors.messages)
     end

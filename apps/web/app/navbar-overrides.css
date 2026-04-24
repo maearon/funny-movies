@@ -3,7 +3,11 @@ body {
   padding-top: 70px;
 }
 
-.navbar-inverse .navbar-brand,
+.gravatar_edit {
+  padding-bottom: 70px;
+}
+
+/* .navbar-inverse .navbar-brand,
 .navbar-inverse .navbar-nav > li > a {
   color: #9d9d9d;
 }
@@ -11,4 +15,4 @@ body {
 .navbar-inverse .navbar-nav > li > a:hover,
 .navbar-inverse .navbar-brand:hover {
   color: #fff;
-}
+} */

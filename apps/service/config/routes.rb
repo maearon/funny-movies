@@ -26,6 +26,7 @@ Rails.application.routes.draw do
     post   '/revoke',             to: 'sessions#revoke'
     resources :users do
       member do
+        get :edit
         get :following
         get :followers
       end
