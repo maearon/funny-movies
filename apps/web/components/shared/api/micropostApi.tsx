@@ -56,7 +56,7 @@ export interface CreateMicropostParams {
   content: string
   title: string
   youtube_id: string
-  image: File
+  image?: File | null
 }
 
 const micropostApi = {
