@@ -11,6 +11,9 @@ module Service
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
+    # Disable wrapping of parameters in JSON. You can enable this by setting :format to an array of formats to wrap, for example, using the JSON format:
+    config.action_controller.wrap_parameters_by_default = false
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
