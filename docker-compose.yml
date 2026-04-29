@@ -1,31 +1,33 @@
+version: "3.9"
+
 services:
-  web:
-    build:
-      context: .
-      dockerfile: docker/web.Dockerfile
-    ports:
-      - "3001:3001"
-    environment:
-      - SERVICE_API_URL=http://localhost:3000
-    networks:
-      - remitano-test-network
+  rails:
+    image: manhng132/rails-api
+    container_name: rails
+    restart: always
+    expose:
+      - "3000"
 
-  service:
-    build:
-      context: .
-      dockerfile: docker/service.Dockerfile
+  nginx:
+    image: nginx:latest
+    container_name: nginx
     ports:
-      - "3000:3000"
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./apps/service:/app
-    working_dir: /app
-    env_file:
-      - ./apps/service/.env
-    environment:
-      - PORT=3000
-    networks:
-      - remitano-test-network
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - certbot-www:/var/www/certbot
+      - certbot-conf:/etc/letsencrypt
+    depends_on:
+      - rails
 
-networks:
-  remitano-test-network:
-    driver: bridge
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-www:/var/www/certbot
+      - certbot-conf:/etc/letsencrypt
+
+volumes:
+  certbot-www:
+  certbot-conf:

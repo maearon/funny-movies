@@ -104,7 +104,10 @@ Rails.application.configure do
   #   "example.com",     # Allow requests from example.com
   #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
   # ]
+  config.hosts << "18.140.7.20"
   config.hosts << /.*\.onrender\.com/
+  config.hosts << /.*\.duckdns\.org/
+  config.hosts << "nguyenducmanh.duckdns.org"
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
