@@ -6,6 +6,6 @@ export const backendOrigin =
   process.env.NEXT_PUBLIC_BACKEND_ORIGIN ??
   (process.env.NODE_ENV === "development"
     ? "http://localhost:3000"
-    : "https://nguyenducmanh.duckdns.org")
+    : "https://funny-movies-b3dt.onrender.com")
 
 export const apiBaseUrl = `${backendOrigin}/api`
